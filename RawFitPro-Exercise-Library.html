@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="var(--bg)">
+<title>RawFitPro — Exercise Library</title>
+<style>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--font-body);font-size:15px;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:inherit;font-size:15px;outline:none;border:none;}
+a{color:inherit;text-decoration:none;}
+
+/* ── VARIABLES (CSS Custom Props — iOS 9.3+) ──────────────────────────── */
+:root{
+  /* ── RawFitPro Brand Palette ── */
+  --bg:#1A1A18;       /* was var(--bg) — now dark slate */
+  --surf:#252520;     /* was var(--surf) — now slate2     */
+  --card:#2E2E28;     /* was var(--card) — now slate3     */
+  --cardh:#383830;    /* was var(--cardh)                  */
+  --bdr:rgba(200,184,154,.12);  /* was var(--bdr)        */
+  --bdr2:rgba(200,184,154,.22);
+  --acc:#C0392B;      /* was var(--acc) — now rust red   */
+  --accl:#E05040;     /* was var(--accl) — lighter rust   */
+  --gold:#D4A853;     /* amber — replaces yellow gold */
+  --blue:#3D9EFF;     /* keep blue for info states    */
+  --grn:#00CC88;      /* keep green for success       */
+  --red:#C0392B;      /* now matches accent           */
+  --txt:#F0EBE3;      /* was var(--txt) — warm white     */
+  --txtM:#A89880;     /* was var(--mut) — warm muted     */
+  --mut:#A89880;
+  --dim:#2E2E28;
+  --sand:#C8B89A;
+  --sandL:#E8D8C0;
+  --stone:#6B6456;
+  --rust:#C0392B;
+  --rust2:#A93226;
+  --amber:#D4A853;
+  --shadow:0 2px 16px rgba(0,0,0,.5);
+  --font-disp:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --font-body:'Barlow',Arial,sans-serif;
+}
+/* ── LIGHT MODE ──────────────────────────────────────────────────────── */
+body.light{
+  --bg:#F2F2EC; --surf:#FFFFFF; --card:#FFFFFF; --cardh:#F7F7F2;
+  --bdr:#E2E2D8; --txt:#1C1C2E; --mut:#8888A0; --dim:#E8E8E0;
+  --shadow:0 2px 12px rgba(0,0,0,.10);
+}
+body.light html,body.light{background:#F2F2EC;color:#1C1C2E;}
+body.light .badge-acc{background:rgba(255,78,0,.12);}
+body.light .badge-blue{background:rgba(61,158,255,.12);}
+body.light .badge-gold{background:rgba(255,179,0,.12);}
+body.light .badge-grn{background:rgba(0,204,136,.12);}
+body.light .badge-mut{background:rgba(136,136,160,.12);}
+body.light .badge-red{background:rgba(255,51,85,.12);}
+body.light #topbar{box-shadow:0 1px 0 var(--bdr);}
+body.light .card{box-shadow:0 1px 4px rgba(0,0,0,.06);}
+body.light .hero{background:linear-gradient(135deg,rgba(255,78,0,.08) 0%,transparent 60%);}
+body.light .bg-surf{background:#F7F7F2;}
+body.light input.inp,body.light select.inp,body.light textarea.inp{background:#F7F7F2;color:#1C1C2E;}
+body.light .sched-bar{background:#FFFFFF!important;border-color:var(--bdr)!important;}
+body.light .idea-card{background:#FFFFFF;}
+body.light .browser{border-color:var(--bdr);}
+/* ── TOGGLE BUTTON ───────────────────────────────────────────────────── */
+#theme-toggle{
+  background:none;border:1px solid var(--bdr);border-radius:20px;
+  padding:5px 12px;font-size:14px;cursor:pointer;color:var(--txt);
+  display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;
+  gap:5px;font-weight:600;font-size:12px;white-space:nowrap;
+  transition:background .2s,border-color .2s;
+}
+#theme-toggle:active{opacity:.7;}
+
+/* ── TYPOGRAPHY HELPERS ───────────────────────────────────────────────── */
+.hd{font-weight:900;letter-spacing:.5px;text-transform:uppercase;}
+.sub{color:var(--mut);font-size:13px;}
+.acc{color:var(--acc);}
+
+/* ── LAYOUT ───────────────────────────────────────────────────────────── */
+#app{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;min-height:100vh;min-height:-webkit-fill-available;}
+#topbar{background:var(--surf);border-bottom:1px solid var(--bdr);padding:0 16px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:space-between;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;-webkit-flex-shrink:0;flex-shrink:0;}
+#topbar-logo{font-family:var(--font-disp);font-weight:900;font-size:20px;letter-spacing:1px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:7px;}
+#navbar{display:-webkit-flex;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--surf);border-bottom:1px solid var(--bdr);-webkit-flex-shrink:0;flex-shrink:0;scrollbar-width:none;}
+#navbar::-webkit-scrollbar{display:none;}
+.nav-tab{padding:10px 12px;background:none;border:none;border-bottom:2px solid transparent;font-weight:700;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);white-space:nowrap;cursor:pointer;-webkit-flex-shrink:0;flex-shrink:0;transition:color .2s;touch-action:manipulation;font-family:var(--font-disp);letter-spacing:.5px;}
+.nav-tab.active{color:var(--acc);border-bottom-color:var(--acc);}
+#main{-webkit-flex:1;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 90px;}
+.screen{display:none;max-width:1100px;width:100%;margin:0 auto;padding:0 4px;}
+.screen.active{display:block;}
+.dash-cols{display:-webkit-flex;display:flex;gap:16px;-webkit-align-items:flex-start;align-items:flex-start;}
+.dash-main{-webkit-flex:1 1 55%;flex:1 1 55%;min-width:0;}
+.dash-side{-webkit-flex:1 1 40%;flex:1 1 40%;min-width:260px;}
+@media(max-width:720px){.dash-cols{-webkit-flex-direction:column;flex-direction:column;}.dash-side{width:100%;-webkit-flex:none;flex:none;}}
+
+/* ── MOBILE RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:480px){
+  #main{padding:12px 10px 110px;padding-bottom:calc(110px + env(safe-area-inset-bottom));}
+  .screen{padding:0;}
+  .card{padding:14px 12px;}
+  .hero{padding:16px 13px;margin-bottom:14px;}
+  .hd{font-size:26px!important;}
+  .stat-num{font-size:22px!important;}
+  .stat{padding:10px 5px;}
+  .stat-icon{font-size:16px;margin-bottom:1px;}
+  .stat-lbl{font-size:9px;}
+  .grid4>*{-webkit-flex:1 1 calc(50% - 4px);flex:1 1 calc(50% - 4px);}
+  .btn{padding:13px 14px;font-size:13px;min-height:44px;}
+  .btn-sm{padding:11px 12px;font-size:12px;min-height:40px;}
+  .btn-icon{padding:8px;min-width:36px;min-height:36px;}
+  .sec-title{font-size:22px;font-family:var(--font-disp);letter-spacing:.5px;}
+  .client-card{padding:13px 11px;}
+  .client-avatar{width:40px;height:40px;font-size:22px;}
+  .inp{font-size:16px!important;padding:12px 11px;min-height:44px;}
+  select.inp{font-size:16px!important;min-height:44px;}
+  textarea.inp{font-size:16px!important;}
+  .cal-day-nav button{padding:10px 13px;min-height:44px;}
+  .time-label{width:40px;font-size:10px;padding-right:4px;}
+  .session-block{padding:8px 10px;min-height:44px;}
+  .session-block .s-name{font-size:12px;}
+  .session-block .s-meta{font-size:10px;}
+  .group-block{padding:8px 10px;}
+  .lib-cat-pill{padding:9px 12px;font-size:11px;min-height:38px;}
+  .ex-card{padding:12px 11px;}
+  #modal-inner{padding:16px 12px 60px;border-radius:20px 20px 0 0;}
+  .modal-handle{margin-bottom:20px;}
+  .nav-tab{padding:12px 10px;font-size:10px;font-family:var(--font-disp);letter-spacing:.5px;}
+  .inner-tab{padding:11px 11px;}
+  .opt-goal{min-height:52px;font-size:13px;}
+  .pill{padding:7px 13px;font-size:13px;min-height:36px;}
+  .badge{font-size:10px;}
+  .sched-bar{padding:11px 12px;}
+  /* Week grid — horizontal scroll on mobile instead of crushing 7 cols */
+  .week-grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -10px;padding:0 10px 8px;}
+  .week-grid{min-width:560px;}
+  /* Plan builder day buttons — stack to 2 per row */
+  .plan-day-row{-webkit-flex-wrap:wrap!important;flex-wrap:wrap!important;}
+  .plan-day-btn{-webkit-flex:1 1 calc(33% - 4px)!important;flex:1 1 calc(33% - 4px)!important;min-height:44px!important;}
+}
+
+/* ── CARDS ───────────────────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:18px;}
+.card-hover{transition:background .2s;}
+.card-hover:active{background:var(--cardh);}
+
+/* ── GRID HELPERS ─────────────────────────────────────────────────────── */
+.grid2{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:10px;}
+.grid2>*{-webkit-flex:1 1 calc(50% - 5px);flex:1 1 calc(50% - 5px);min-width:130px;}
+.grid4{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:8px;}
+.grid4>*{-webkit-flex:1 1 calc(25% - 6px);flex:1 1 calc(25% - 6px);min-width:120px;}
+.col{display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:10px;}
+.row{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:10px;}
+.row-sb{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:space-between;justify-content:space-between;}
+.wrap{-webkit-flex-wrap:wrap;flex-wrap:wrap;}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────── */
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:none;transition:opacity .15s,transform .1s;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+.btn:active{opacity:.85;-webkit-transform:scale(.97);transform:scale(.97);}
+.btn-primary{background:var(--acc);color:#fff;}
+.btn-green{background:var(--grn);color:#000;}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-ghost{background:transparent;color:var(--txt);border:1px solid var(--bdr);}
+.btn-sm{padding:7px 13px;font-size:11px;}
+.btn-wide{width:100%;text-align:center;}
+.btn-icon{background:none;border:none;cursor:pointer;padding:4px;font-size:17px;color:var(--mut);}
+
+/* ── FORM ELEMENTS ───────────────────────────────────────────────────── */
+.lbl{display:block;font-weight:700;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:5px;}
+.inp{width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:10px 13px;color:var(--txt);font-size:15px;}
+.inp:focus{border-color:var(--acc);}
+textarea.inp{resize:vertical;min-height:64px;}
+select.inp{-webkit-appearance:none;appearance:none;}
+
+/* ── BADGES ──────────────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-weight:700;font-size:11px;letter-spacing:.4px;text-transform:uppercase;}
+.badge-acc{background:rgba(255,78,0,.15);color:var(--acc);}
+.badge-blue{background:rgba(61,158,255,.15);color:var(--blue);}
+.badge-gold{background:rgba(255,179,0,.15);color:var(--gold);}
+.badge-grn{background:rgba(0,204,136,.15);color:var(--grn);}
+.badge-mut{background:rgba(119,119,136,.15);color:var(--mut);}
+.badge-red{background:rgba(255,51,85,.15);color:var(--red);}
+
+/* ── PROGRESS BAR ─────────────────────────────────────────────────────── */
+.prog-wrap{margin-bottom:14px;}
+.prog-meta{display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;margin-bottom:5px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;}
+.prog-track{height:4px;background:var(--dim);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .3s;}
+
+/* ── STAT CARDS ──────────────────────────────────────────────────────── */
+.stat{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 10px;text-align:center;}
+.stat-num{font-weight:900;font-size:34px;line-height:1;}
+.stat-lbl{font-weight:700;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-top:3px;}
+.stat-icon{font-size:22px;margin-bottom:3px;}
+
+/* ── OPTION BUTTONS (quiz) ───────────────────────────────────────────── */
+.opt-btn{display:block;width:100%;padding:11px 13px;border:2px solid var(--bdr);border-radius:8px;background:var(--card);color:var(--txt);font-size:14px;text-align:left;cursor:pointer;transition:all .18s;margin-bottom:6px;}
+.opt-btn.sel{border-color:var(--acc);background:rgba(255,78,0,.15);color:var(--acc);}
+.opt-grid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:7px;}
+.opt-grid .opt-btn{width:auto;-webkit-flex:1 1 auto;flex:1 1 auto;}
+.opt-goal{-webkit-flex:1 1 calc(50% - 4px);flex:1 1 calc(50% - 4px);min-width:130px;padding:13px 11px;}
+
+/* ── TAG PILLS ───────────────────────────────────────────────────────── */
+.pill{display:inline-block;padding:4px 11px;border-radius:20px;border:1px solid var(--bdr);background:var(--card);color:var(--txt);font-size:12px;cursor:pointer;margin:3px;}
+.pill.on{border-color:var(--gold);background:rgba(255,179,0,.15);color:var(--gold);}
+.pill.on-red{border-color:var(--red);background:rgba(255,51,85,.15);color:var(--red);}
+
+/* ── SECTION HEADERS ─────────────────────────────────────────────────── */
+.sec-title{font-weight:900;font-size:28px;text-transform:uppercase;line-height:1;margin-bottom:4px;font-family:var(--font-disp);letter-spacing:.5px;}
+.sec-sub{color:var(--mut);font-size:13px;margin-bottom:18px;}
+
+/* ── NAV INNER TABS ──────────────────────────────────────────────────── */
+.inner-tabs{display:-webkit-flex;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--bdr);margin-bottom:16px;scrollbar-width:none;}
+.inner-tabs::-webkit-scrollbar{display:none;}
+.inner-tab{padding:9px 13px;background:none;border:none;border-bottom:2px solid transparent;font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);white-space:nowrap;cursor:pointer;-webkit-flex-shrink:0;flex-shrink:0;}
+.inner-tab.active{border-bottom-color:var(--acc);color:var(--acc);}
+
+/* ── DIVIDER ─────────────────────────────────────────────────────────── */
+hr.div{border:none;border-top:1px solid var(--bdr);margin:14px 0;}
+
+/* ── HERO ────────────────────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,rgba(255,78,0,.12) 0%,transparent 60%);border:1px solid var(--bdr);border-radius:14px;padding:22px 18px;margin-bottom:18px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;right:-10px;top:-10px;font-size:90px;font-weight:900;letter-spacing:-2px;opacity:.05;user-select:none;line-height:1;}
+
+/* ── SCHEDULE BAR ────────────────────────────────────────────────────── */
+.sched-bar{border-radius:10px;padding:13px 14px;margin-bottom:7px;cursor:pointer;}
+.sched-edit{border-radius:10px;padding:16px;margin-bottom:7px;background:var(--cardh);border:1px solid var(--acc);}
+
+/* ── PLAN OUTPUT ─────────────────────────────────────────────────────── */
+.plan-section{margin-bottom:20px;}
+.plan-section-title{font-weight:900;font-size:16px;color:var(--acc);text-transform:uppercase;padding-bottom:7px;border-bottom:1px solid var(--bdr);margin-bottom:9px;letter-spacing:.4px;}
+.plan-body{font-size:13px;line-height:1.75;white-space:pre-wrap;color:var(--txt);}
+
+/* ── CLIENT CARD ─────────────────────────────────────────────────────── */
+.client-card{border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;border:1px solid var(--bdr);background:var(--card);}
+.client-avatar{width:46px;height:46px;border-radius:10px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;-webkit-justify-content:center;justify-content:center;font-size:26px;-webkit-flex-shrink:0;flex-shrink:0;}
+.injury-tag{padding:5px 10px;background:rgba(255,179,0,.12);border-radius:6px;font-size:11px;color:var(--gold);margin-top:8px;}
+
+/* ── CONTENT IDEA CARD ───────────────────────────────────────────────── */
+.idea-card{border-radius:10px;padding:14px;margin-bottom:9px;border:1px solid var(--bdr);background:var(--card);}
+.idea-num{background:rgba(255,68,68,.13);border:1px solid rgba(255,68,68,.3);border-radius:7px;padding:4px 9px;font-weight:800;font-size:12px;color:#FF6666;}
+
+/* ── WEBSITE PREVIEW ─────────────────────────────────────────────────── */
+.browser{border:1px solid var(--bdr);border-radius:12px;overflow:hidden;}
+.browser-bar{background:var(--surf);padding:9px 13px;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:9px;}
+.dot{width:11px;height:11px;border-radius:50%;}
+.url-bar{-webkit-flex:1;flex:1;background:var(--card);border-radius:5px;padding:4px 10px;font-size:11px;color:var(--mut);}
+.site-nav{background:#111;border-bottom:1px solid #1e1e1e;padding:11px 18px;display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;-webkit-align-items:center;align-items:center;}
+.site-logo{font-weight:900;font-size:17px;color:var(--acc);}
+.site-links{display:-webkit-flex;display:flex;gap:12px;font-size:11px;font-weight:600;color:#555;}
+.site-hero{padding:36px 18px;text-align:center;border-bottom:1px solid #1a1a1a;}
+.site-services{padding:22px 18px;}
+.svc-item{background:#141414;border:1px solid #1e1e1e;border-radius:9px;padding:13px;text-align:center;-webkit-flex:1 1 calc(50% - 4px);flex:1 1 calc(50% - 4px);}
+
+/* ── TOAST NOTIFICATION ──────────────────────────────────────────────── */
+#toast{position:fixed;bottom:80px;left:50%;-webkit-transform:translateX(-50%) translateY(30px);transform:translateX(-50%) translateY(30px);background:var(--grn);color:#000;padding:10px 22px;border-radius:20px;font-weight:700;font-size:13px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;-webkit-transform:translateX(-50%) translateY(0);transform:translateX(-50%) translateY(0);}
+
+/* ── MODAL OVERLAY ───────────────────────────────────────────────────── */
+#modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:200;display:none;-webkit-overflow-scrolling:touch;overflow-y:auto;}
+#modal.open{display:block;}
+#modal-inner{background:var(--surf);border-radius:16px 16px 0 0;position:absolute;bottom:0;left:0;right:0;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 16px 40px;}
+.modal-handle{width:36px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 16px;}
+
+/* ── UTILITIES ───────────────────────────────────────────────────────── */
+.mb4{margin-bottom:4px;} .mb8{margin-bottom:8px;} .mb12{margin-bottom:12px;} .mb16{margin-bottom:16px;} .mb20{margin-bottom:20px;}
+.mt8{margin-top:8px;} .mt12{margin-top:12px;} .mt16{margin-top:16px;}
+.p0{padding:0;} .bold{font-weight:700;} .f12{font-size:12px;} .f13{font-size:13px;} .f14{font-size:14px;}
+.txt-acc{color:var(--acc);} .txt-gold{color:var(--gold);} .txt-grn{color:var(--grn);} .txt-blue{color:var(--blue);} .txt-mut{color:var(--mut);} .txt-red{color:var(--red);}
+.bg-surf{background:var(--surf);}
+.full{width:100%;}
+.hidden{display:none!important;}
+.border-l-acc{border-left:3px solid var(--acc);}
+.border-l-blue{border-left:3px solid var(--blue);}
+.border-l-gold{border-left:3px solid var(--gold);}
+.border-l-grn{border-left:3px solid var(--grn);}
+.border-l-yt{border-left:3px solid #FF4444;}
+.border-l-ig{border-left:3px solid #E1306C;}
+.border-l-tt{border-left:3px solid #69C9D0;}
+.italic{font-style:italic;}
+.center{text-align:center;}
+/* ── CALENDAR ─────────────────────────────────────────────────────── */
+.cal-view-btn{padding:7px 18px;border-radius:20px;border:1px solid var(--bdr);background:none;color:var(--mut);font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;}
+.cal-view-btn.active{background:var(--acc);border-color:var(--acc);color:#fff;}
+.cal-day-nav{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:10px;}
+.cal-day-nav button{background:none;border:1px solid var(--bdr);color:var(--txt);border-radius:8px;padding:6px 13px;font-weight:700;cursor:pointer;font-size:14px;}
+.time-slot{display:-webkit-flex;display:flex;gap:0;min-height:54px;border-bottom:1px solid var(--bdr);}
+.time-label{width:58px;-webkit-flex-shrink:0;flex-shrink:0;padding:8px 6px 0 0;font-size:11px;font-weight:700;color:var(--mut);text-align:right;line-height:1.2;}
+.time-content{-webkit-flex:1;flex:1;padding:4px 0 4px 10px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:4px;}
+.session-block{border-radius:9px;padding:9px 12px;cursor:pointer;transition:opacity .15s;position:relative;}
+.session-block:active{opacity:.8;}
+.session-block .s-name{font-weight:800;font-size:13px;line-height:1.2;}
+.session-block .s-meta{font-size:11px;opacity:.85;margin-top:2px;}
+.session-block .s-note-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.2);border:none;color:#fff;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;font-weight:700;}
+.group-block{border-radius:9px;padding:9px 12px;cursor:default;}
+.group-block .s-name{font-weight:800;font-size:13px;}
+.group-block .s-meta{font-size:11px;opacity:.85;margin-top:2px;}
+.group-members{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.group-member-chip{background:rgba(0,0,0,.2);border-radius:12px;padding:2px 9px;font-size:11px;font-weight:700;cursor:pointer;}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px;}
+.week-day-col{border-radius:8px;overflow:hidden;}
+.week-day-hdr{padding:6px 4px;text-align:center;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.week-day-hdr.today-hdr{background:var(--acc);color:#fff;}
+.week-session-chip{padding:3px 5px;margin:2px 3px;border-radius:5px;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:block;}
+.has-note-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle;}
+/* ── EXERCISE LIBRARY ─────────────────────────────────────────────── */
+.lib-cat-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--bdr);background:none;color:var(--mut);font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.lib-cat-pill.active{background:var(--acc);border-color:var(--acc);color:#fff;}
+.ex-card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:13px 14px;cursor:pointer;transition:border-color .15s;}
+.ex-card:hover,.ex-card:active{border-color:var(--acc);}
+.ex-card .ex-name{font-weight:800;font-size:14px;line-height:1.2;margin-bottom:3px;}
+.ex-card .ex-tags{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.ex-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--surf);color:var(--mut);}
+.ex-tag.primary{background:rgba(255,78,0,.15);color:var(--acc);}
+.ex-tag.cat{background:rgba(61,158,255,.15);color:var(--blue);}
+.ex-tag.muscle{background:rgba(0,204,136,.12);color:var(--grn);}
+.muscle-svg{width:100%;max-width:280px;display:block;margin:0 auto;}
+.muscle-svg path{transition:fill .2s;}
+.muscle-svg .inactive{fill:#2a2a3a;}
+.muscle-svg .primary-m{fill:var(--acc);}
+.muscle-svg .secondary-m{fill:var(--gold);}
+.muscle-svg .outline{fill:none;stroke:#444;stroke-width:1px;}
+.diff-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+.custom-badge{font-size:9px;font-weight:800;background:rgba(255,179,0,.2);color:var(--gold);padding:1px 7px;border-radius:8px;margin-left:5px;vertical-align:middle;}
+
+/* ── DEMO BANNER ──────────────────────────────────────────────────── */
+#demo-banner {
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:linear-gradient(90deg,#1a1a18,#2a1f1a,#1a1a18);
+  border-top:2px solid #C0392B;
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+  font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+}
+.demo-badge {
+  background:#C0392B;color:#fff;
+  font-size:11px;font-weight:800;letter-spacing:2px;
+  padding:4px 10px;border-radius:2px;text-transform:uppercase;
+  flex-shrink:0;
+}
+.demo-text {
+  font-size:13px;color:#C8B89A;flex:1;min-width:200px;
+}
+.demo-text strong { color:#fff; }
+.demo-creds {
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.demo-cred-btn {
+  font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  background:rgba(192,57,43,.2);color:#C8B89A;
+  border:1px solid rgba(192,57,43,.4);
+  padding:6px 14px;border-radius:2px;cursor:pointer;
+  transition:background .2s;white-space:nowrap;
+}
+.demo-cred-btn:hover,.demo-cred-btn.active {
+  background:#C0392B;color:#fff;border-color:#C0392B;
+}
+.demo-close {
+  background:none;border:1px solid rgba(200,184,154,.2);
+  color:#6B6456;font-size:16px;
+  padding:4px 10px;border-radius:2px;cursor:pointer;
+  flex-shrink:0;
+}
+.demo-close:hover{color:#C8B89A;}
+
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- DEMO BANNER -->
+<div id="demo-banner">
+  <span class="demo-badge">⚡ Demo Mode</span>
+  <div class="demo-text">
+    <strong>RawFitPro Exercise Library</strong> — 100+ exercises with muscle diagrams, coaching cues, and form video links. Tap any exercise to explore.
+  </div>
+  <button class="demo-close" onclick="document.getElementById('demo-banner').style.display='none'" title="Hide banner">✕</button>
+</div>
+
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div id="topbar-logo">
+    <span>⚡</span>
+    <span>Raw<span class="txt-acc">Fit</span>Pro</span>
+  </div>
+  <div style="display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;gap:8px;">
+    <a href="RawFitPro-Website.html" style="background:none;border:1px solid rgba(255,255,255,.2);color:var(--txt);padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;">← Website</a>
+  </div>
+</div>
+
+<!-- NO NAVBAR — public read-only library only -->
+
+<!-- MAIN -->
+<div id="main">
+  <div id="screen-library" class="screen active"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modal"><div id="modal-content"></div></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ── EXERCISE DATA ─────────────────────────────────────────────────────
+var LIB_SEARCH = '';
+var LIB_CAT = 'All';
+
+var LIB_CATS = ['All','Chest','Back','Shoulders','Arms','Legs','Core','Cardio','HIIT','Kettlebell','Medicine Ball','Resistance Band','Bodyweight','Flexibility','Outdoor'];
+
+var MUSCLE_COLORS = {
+  chest:'var(--acc)', shoulders:'var(--acc)', triceps:'var(--acc)', biceps:'var(--acc)',
+  back:'#3D9EFF', lats:'#3D9EFF', traps:'#3D9EFF', forearms:'#3D9EFF',
+  core:'var(--gold)', hip_flexors:'var(--gold)',
+  quads:'#00CC88', glutes:'#00CC88', hamstrings:'#00CC88', calves:'#00CC88',
+  full_body:'#AA66FF'
+};
+
+var LIB_VIEW = 'browse'; // 'browse' | 'custom'
+var LIB_PICKER_CID = null; // clientId when library opened from program builder
+
+var CUSTOM_EXERCISES = []; // trainer-added exercises, saved to localStorage
+
+var EXERCISE_LIB = [
+  {id:"e001",name:"Barbell Bench Press",cat:"Chest",equipment:"Barbell + Bench",difficulty:"Intermediate",
+   muscles:{primary:["chest"],secondary:["shoulders","triceps"]},
+   desc:"The foundational chest press. Lying flat on a bench, lower a barbell to mid-chest then press back up.",
+   cues:["Plant feet flat on floor","Retract and depress shoulder blades into bench","Lower bar to nipple line — not neck","Elbows at ~75° to torso, not flared 90°","Drive through the bar, not just push away"],
+   mistakes:["Bouncing bar off chest","Arching back excessively","Flaring elbows out","Uneven grip"],
+   youtubeQuery:"barbell bench press proper form tutorial"},
+  {id:"e002",name:"Dumbbell Bench Press",cat:"Chest",equipment:"Dumbbells + Bench",difficulty:"Beginner",
+   muscles:{primary:["chest"],secondary:["shoulders","triceps"]},
+   desc:"Same movement as barbell press but with independent dumbbells — greater range of motion and stabilizer engagement.",
+   cues:["Start with dumbbells at chest level","Maintain neutral wrist throughout","Press up and slightly inward","Control the descent — 2-3 sec down"],
+   mistakes:["Letting wrists cave inward","Losing shoulder blade position","Rushing the eccentric"],
+   youtubeQuery:"dumbbell bench press form"},
+  {id:"e003",name:"Incline Bench Press",cat:"Chest",equipment:"Barbell + Incline Bench",difficulty:"Intermediate",
+   muscles:{primary:["chest"],secondary:["shoulders","triceps"]},
+   desc:"Bench set to 30-45 degrees. Emphasizes upper chest and front deltoids.",
+   cues:["Set bench 30-45 degrees — higher angles shift to shoulders","Touch bar to upper chest","Keep core tight throughout"],
+   mistakes:["Setting incline too steep (over 45 degrees)","Lifting hips off bench"],
+   youtubeQuery:"incline bench press form tutorial"},
+  {id:"e004",name:"Cable Fly",cat:"Chest",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["chest"],secondary:["shoulders"]},
+   desc:"Standing or seated cable crossover that keeps constant tension on chest through full range of motion.",
+   cues:["Slight bend in elbow — never locked","Lead with elbow, not hand","Squeeze chest at the peak contraction","Control the return — resist the pull"],
+   mistakes:["Straightening arms fully","Using momentum to swing cables"],
+   youtubeQuery:"cable fly chest proper form"},
+  {id:"e005",name:"Dumbbell Fly",cat:"Chest",equipment:"Dumbbells + Bench",difficulty:"Beginner",
+   muscles:{primary:["chest"],secondary:["shoulders"]},
+   desc:"Lying flat or on incline, arc dumbbells out wide then squeeze back. Pure chest stretch and contraction.",
+   cues:["Maintain a hugging-a-barrel arc path","Stop when chest feels fully stretched","Never go below shoulder height","Light weight — this is an isolation move"],
+   mistakes:["Going too heavy","Bending elbows too much (turns into press)"],
+   youtubeQuery:"dumbbell fly proper form"},
+  {id:"e006",name:"Push-Up",cat:"Chest",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["chest"],secondary:["shoulders","triceps","core"]},
+   desc:"Classic bodyweight pressing movement. Dozens of variations for all fitness levels.",
+   cues:["Hands slightly wider than shoulders","Body forms a straight plank line","Lower chest to near floor","Elbows at 45 degree angle, not straight out"],
+   mistakes:["Sagging hips","Flaring elbows wide","Not reaching full depth","Head jutting forward"],
+   youtubeQuery:"perfect push up form"},
+  {id:"e007",name:"Decline Push-Up",cat:"Chest",equipment:"None + Elevated Surface",difficulty:"Intermediate",
+   muscles:{primary:["chest"],secondary:["shoulders","triceps"]},
+   desc:"Feet elevated on bench or step. Shifts emphasis to upper chest.",
+   cues:["Feet on stable elevated surface","Same push-up mechanics apply","Core stays tight throughout"],
+   mistakes:["Using surface that is too high","Losing plank alignment"],
+   youtubeQuery:"decline push up upper chest"},
+  {id:"e008",name:"Dips (Chest Focus)",cat:"Chest",equipment:"Dip Bars",difficulty:"Intermediate",
+   muscles:{primary:["chest"],secondary:["triceps","shoulders"]},
+   desc:"Lean forward 30 degrees on parallel bars. This angle recruits chest far more than upright dips.",
+   cues:["Lean torso forward 30 degrees for chest focus","Lower until shoulders are below elbows","Control descent — 2-3 sec down","Cross ankles behind to reduce swinging"],
+   mistakes:["Staying too upright (shifts to triceps)","Locking out at top under heavy load"],
+   youtubeQuery:"chest dips proper form"},
+  {id:"e009",name:"Pull-Up",cat:"Back",equipment:"Pull-Up Bar",difficulty:"Intermediate",
+   muscles:{primary:["lats","back"],secondary:["biceps","core"]},
+   desc:"Upper body compound pull. Pull body up until chin clears bar using a pronated grip.",
+   cues:["Start from dead hang — full arm extension","Pull elbows down and back, not curl hands up","Think elbows to hips","Chest up at top of movement"],
+   mistakes:["Kipping (for strength work)","Not reaching full hang at bottom","Chin just barely clearing bar"],
+   youtubeQuery:"pull up proper form tutorial"},
+  {id:"e010",name:"Chin-Up",cat:"Back",equipment:"Pull-Up Bar",difficulty:"Intermediate",
+   muscles:{primary:["lats","biceps"],secondary:["back","core"]},
+   desc:"Supinated (underhand) grip pull-up. Greater bicep involvement, slightly easier for beginners.",
+   cues:["Shoulder-width supinated grip","Initiate with lats, finish with biceps","Full range of motion — dead hang to chin over bar"],
+   mistakes:["Using only biceps","Partial range of motion"],
+   youtubeQuery:"chin up vs pull up form"},
+  {id:"e011",name:"Barbell Row",cat:"Back",equipment:"Barbell",difficulty:"Intermediate",
+   muscles:{primary:["back","lats"],secondary:["biceps","traps","core"]},
+   desc:"Hinged at hips ~45 degrees, pull barbell to lower chest/upper abdomen. Elite mass builder for the back.",
+   cues:["Hinge at hips — not squat down","Bar path to lower chest, not belly button","Retract shoulder blades at top","Control the lowering phase"],
+   mistakes:["Rounding lower back","Pulling bar to stomach","Using momentum to heave the bar"],
+   youtubeQuery:"barbell row proper form"},
+  {id:"e012",name:"Dumbbell Row",cat:"Back",equipment:"Dumbbell + Bench",difficulty:"Beginner",
+   muscles:{primary:["back","lats"],secondary:["biceps","traps"]},
+   desc:"Single-arm row braced on bench. Allows heavier loads and longer range of motion than barbell row.",
+   cues:["Plant opposite hand and knee on bench","Pull elbow toward ceiling, not out to side","Shoulder blade fully retracts at top","Torso stays parallel to floor"],
+   mistakes:["Rotating torso to swing weight up","Pulling with bicep instead of back"],
+   youtubeQuery:"dumbbell row proper form"},
+  {id:"e013",name:"Lat Pulldown",cat:"Back",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["lats"],secondary:["back","biceps","traps"]},
+   desc:"Cable machine pulling bar down to upper chest. Great lat builder accessible to all levels.",
+   cues:["Lean back slightly — about 15 degrees","Pull to upper chest, not behind neck","Lead with elbows, drive them to hips","Avoid shrugging shoulders up"],
+   mistakes:["Pulling behind the neck","Excessive lean-back (turns into a row)","Using too much weight — short range of motion"],
+   youtubeQuery:"lat pulldown proper form"},
+  {id:"e014",name:"Seated Cable Row",cat:"Back",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["back","lats"],secondary:["biceps","traps"]},
+   desc:"Seated row targeting mid-back. V-bar attachment emphasizes middle back, wide bar hits outer lats.",
+   cues:["Sit tall — avoid rounding forward","Pull handle to lower abdomen","Squeeze shoulder blades together at end","Control the return — don't let cable pull you"],
+   mistakes:["Rounding forward to start each rep","Pulling to chest instead of abdomen"],
+   youtubeQuery:"seated cable row form"},
+  {id:"e015",name:"Deadlift",cat:"Back",equipment:"Barbell",difficulty:"Advanced",
+   muscles:{primary:["back","glutes","hamstrings"],secondary:["traps","core","quads","forearms"]},
+   desc:"The king of all exercises. Lift loaded barbell from floor to hip extension. Full posterior chain.",
+   cues:["Bar over mid-foot — 1 inch from shins","Hips hinge back — not squat down","Chest up, neutral spine throughout","Drive floor away, not pull bar up","Lock out hips and knees simultaneously"],
+   mistakes:["Rounding lower back","Bar drifting away from body","Jerking the bar off floor","Hyperextending at lockout"],
+   youtubeQuery:"deadlift proper form tutorial"},
+  {id:"e016",name:"Trap Bar Deadlift",cat:"Back",equipment:"Trap Bar",difficulty:"Intermediate",
+   muscles:{primary:["glutes","quads","hamstrings"],secondary:["back","traps","core"]},
+   desc:"Hexagonal bar positions weight at sides. More knee-friendly than conventional deadlift, easier to learn.",
+   cues:["Handles at mid-foot level","Sit into the bar — more squat-like","Drive through heels","Hips and shoulders rise together"],
+   mistakes:["Letting hips rise first","Bar drifting forward"],
+   youtubeQuery:"trap bar deadlift form"},
+  {id:"e017",name:"Face Pull",cat:"Back",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["traps","shoulders"],secondary:["back"]},
+   desc:"Cable pulled to face with external rotation. Critical for shoulder health, rear delt and trap development.",
+   cues:["Set cable at upper chest/face height","Pull handles to ears — not forehead","Elbows drive back and up (W shape at top)","Rotate wrists back at peak"],
+   mistakes:["Pulling too low (becomes row)","No external rotation at end"],
+   youtubeQuery:"face pull proper form shoulder health"},
+  {id:"e018",name:"Overhead Press",cat:"Shoulders",equipment:"Barbell",difficulty:"Intermediate",
+   muscles:{primary:["shoulders"],secondary:["triceps","traps","core"]},
+   desc:"Standing or seated press of barbell overhead. Builds massive shoulders and pressing strength.",
+   cues:["Bar starts at collarbone height","Squeeze glutes and brace core — protect spine","Press bar straight up — head moves back through the window","Lock out overhead — don't stop short"],
+   mistakes:["Excessive back arch","Pressing in front of face instead of over head","Letting elbows flare too wide"],
+   youtubeQuery:"overhead press proper form"},
+  {id:"e019",name:"Dumbbell Shoulder Press",cat:"Shoulders",equipment:"Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["shoulders"],secondary:["triceps","traps"]},
+   desc:"Seated or standing dumbbell press. Each arm works independently improving stability.",
+   cues:["Start at ear level, elbows at 90 degrees","Press up and slightly in — natural arc","Avoid locking out aggressively if shoulder history"],
+   mistakes:["Pressing dumbbells too far out to sides","Leaning back excessively"],
+   youtubeQuery:"dumbbell shoulder press form"},
+  {id:"e020",name:"Lateral Raise",cat:"Shoulders",equipment:"Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["shoulders"],secondary:[]},
+   desc:"Dumbbell raise to side targeting medial deltoid — the muscle that creates shoulder width.",
+   cues:["Slight bend in elbow throughout","Lead with pinky up (slight internal rotation)","Raise to shoulder height only — parallel to floor","Control the descent — 3 sec down"],
+   mistakes:["Using too heavy weight / shrugging at top","Swinging body to get weight up","Going above shoulder height"],
+   youtubeQuery:"lateral raise proper form no cheating"},
+  {id:"e021",name:"Front Raise",cat:"Shoulders",equipment:"Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["shoulders"],secondary:["chest"]},
+   desc:"Lift dumbbells forward to shoulder height. Targets anterior (front) deltoid.",
+   cues:["Slight bend in elbow","Raise to shoulder height — no higher","Alternate arms or both together","Avoid swinging"],
+   mistakes:["Going too heavy","Using momentum"],
+   youtubeQuery:"front raise shoulder exercise form"},
+  {id:"e022",name:"Arnold Press",cat:"Shoulders",equipment:"Dumbbells",difficulty:"Intermediate",
+   muscles:{primary:["shoulders"],secondary:["triceps"]},
+   desc:"Rotating dumbbell press developed by Arnold Schwarzenegger. Works all three deltoid heads.",
+   cues:["Start with palms facing you","Rotate palms forward as you press","Reverse the rotation on descent","Full range of motion — don't rush"],
+   mistakes:["Rushing the rotation","Partial range of motion"],
+   youtubeQuery:"arnold press form all deltoid heads"},
+  {id:"e023",name:"Barbell Curl",cat:"Arms",equipment:"Barbell",difficulty:"Beginner",
+   muscles:{primary:["biceps"],secondary:["forearms"]},
+   desc:"Standard barbell curl for bicep mass. Allows heavier loads than dumbbells.",
+   cues:["Elbows stay pinned at sides","Full range — dead hang to full contraction","Squeeze hard at top","Slow controlled descent — 2-3 sec"],
+   mistakes:["Swinging body back","Partial range of motion","Wrists bending backward"],
+   youtubeQuery:"barbell curl proper form biceps"},
+  {id:"e024",name:"Dumbbell Curl",cat:"Arms",equipment:"Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["biceps"],secondary:["forearms"]},
+   desc:"Classic alternating or simultaneous dumbbell curl. Foundation of bicep training.",
+   cues:["Supinate wrist at bottom of curl","Elbows don't travel forward as you curl","Full extension at bottom","Squeeze at peak contraction"],
+   mistakes:["Elbow drifting forward","Short range of motion"],
+   youtubeQuery:"dumbbell curl proper form biceps"},
+  {id:"e025",name:"Hammer Curl",cat:"Arms",equipment:"Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["biceps"],secondary:["forearms","brachialis"]},
+   desc:"Neutral grip (thumbs up) curl. Targets brachialis and brachioradialis for thick arm development.",
+   cues:["Neutral grip throughout — thumbs up the whole time","Can do alternating or both arms","Elbows stay at sides"],
+   mistakes:["Letting wrists rotate (becomes standard curl)","Swinging"],
+   youtubeQuery:"hammer curl form brachialis"},
+  {id:"e026",name:"Tricep Pushdown",cat:"Arms",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["triceps"],secondary:[]},
+   desc:"Cable pushdown targeting all three tricep heads. Keeps constant tension on the muscle.",
+   cues:["Elbows stay fixed at sides — don't let them move","Full extension at bottom","Don't lean too far forward","Control the return"],
+   mistakes:["Letting elbows flare and drift forward","Partial lockout at bottom"],
+   youtubeQuery:"tricep pushdown proper form"},
+  {id:"e027",name:"Tricep Overhead Extension",cat:"Arms",equipment:"Dumbbell",difficulty:"Beginner",
+   muscles:{primary:["triceps"],secondary:[]},
+   desc:"Long head of tricep emphasis — the part that adds mass to the back of the arm.",
+   cues:["Keep elbows pointing straight up","Lower weight behind head — don't let elbows flare","Full extension at top","Single or double dumbbell"],
+   mistakes:["Elbows flaring out","Partial range of motion"],
+   youtubeQuery:"tricep overhead extension long head"},
+  {id:"e028",name:"Skull Crusher",cat:"Arms",equipment:"EZ Bar + Bench",difficulty:"Intermediate",
+   muscles:{primary:["triceps"],secondary:[]},
+   desc:"Lying tricep extension lowering bar toward forehead. Great mass builder.",
+   cues:["Lower bar to forehead or just behind head","Elbows stay pointed at ceiling throughout","Control the movement — no momentum"],
+   mistakes:["Letting elbows flare wide","Lowering too fast"],
+   youtubeQuery:"skull crusher EZ bar form"},
+  {id:"e029",name:"Dips (Tricep Focus)",cat:"Arms",equipment:"Dip Bars or Chair",difficulty:"Intermediate",
+   muscles:{primary:["triceps"],secondary:["chest","shoulders"]},
+   desc:"Stay upright on dip bars to maximize tricep recruitment over chest.",
+   cues:["Keep torso upright — don't lean forward","Lower until elbows reach 90 degrees","Lockout at top","Can use chair for assisted version"],
+   mistakes:["Leaning too far forward (shifts to chest)","Going too deep straining shoulders"],
+   youtubeQuery:"tricep dips proper form upright"},
+  {id:"e030",name:"Barbell Back Squat",cat:"Legs",equipment:"Barbell + Rack",difficulty:"Intermediate",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core","calves"]},
+   desc:"The fundamental lower body strength exercise. Bar rests on upper traps. Sit and stand.",
+   cues:["Bar on upper traps — not neck","Chest up, brace core before descent","Sit between legs — knees track over toes","Hit parallel or below","Drive through full foot — not just heels"],
+   mistakes:["Knees caving inward (valgus collapse)","Forward lean","Not reaching depth","Heels rising"],
+   youtubeQuery:"barbell back squat proper form tutorial"},
+  {id:"e031",name:"Goblet Squat",cat:"Legs",equipment:"Dumbbell or Kettlebell",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["core","hamstrings"]},
+   desc:"Hold dumbbell/kettlebell at chest, squat deep. Excellent form teacher and workout tool.",
+   cues:["Hold weight at sternum throughout","Elbows track inside knees at bottom","Sit tall — don't round forward","Drive knees out as you descend"],
+   mistakes:["Leaning too far forward","Not reaching full depth"],
+   youtubeQuery:"goblet squat form tutorial"},
+  {id:"e032",name:"Bulgarian Split Squat",cat:"Legs",equipment:"Bench + Dumbbells",difficulty:"Intermediate",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Rear foot elevated split squat. Unilateral — addresses imbalances, greater depth than regular lunge.",
+   cues:["Front foot far enough forward — shin stays vertical","Rear foot top on bench","Lower straight down — not forward","Front knee tracks over second toe"],
+   mistakes:["Front foot too close — forward lean","Knee caving inward","Losing balance — slow down"],
+   youtubeQuery:"bulgarian split squat form"},
+  {id:"e033",name:"Leg Press",cat:"Legs",equipment:"Leg Press Machine",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","calves"]},
+   desc:"Machine press with feet on platform. Allows heavy loads safely. Foot placement changes muscle focus.",
+   cues:["Feet hip-width at mid-platform height","Lower platform until 90 degree knee angle","Don't let lower back round off pad","High foot placement = more glutes and hamstrings","Low placement = more quads"],
+   mistakes:["Locking knees out under heavy load","Bouncing at bottom","Raising hips off seat"],
+   youtubeQuery:"leg press machine form foot placement"},
+  {id:"e034",name:"Lunge",cat:"Legs",equipment:"None or Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core","calves"]},
+   desc:"Step forward and lower back knee toward floor. Walking or stationary versions.",
+   cues:["Step far enough forward — front shin stays vertical","Lower back knee toward floor — don't slam it","Front knee tracks over second toe","Push through front heel to return"],
+   mistakes:["Step too short — forward knee past toes","Knee caving inward","Leaning forward excessively"],
+   youtubeQuery:"lunge proper form knee safe"},
+  {id:"e035",name:"Reverse Lunge",cat:"Legs",equipment:"None or Dumbbells",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Step backward instead of forward. More knee-friendly than forward lunge.",
+   cues:["Step back far enough — front shin stays vertical","Lower back knee toward floor","Stay upright — don't lean forward","Push through front foot to return"],
+   mistakes:["Step too short","Leaning forward","Knee caving"],
+   youtubeQuery:"reverse lunge form knee friendly"},
+  {id:"e036",name:"Walking Lunge",cat:"Legs",equipment:"None or Dumbbells",difficulty:"Intermediate",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core","calves"]},
+   desc:"Continuous lunging movement traveling forward. Builds endurance and coordination.",
+   cues:["Maintain upright torso throughout","Control each step — don't rush","Consistent stride length"],
+   mistakes:["Rushing and losing control","Leaning forward","Knees caving"],
+   youtubeQuery:"walking lunge proper form"},
+  {id:"e037",name:"Leg Extension",cat:"Legs",equipment:"Leg Extension Machine",difficulty:"Beginner",
+   muscles:{primary:["quads"],secondary:[]},
+   desc:"Machine isolation for quads. Extend legs from seated position.",
+   cues:["Full extension at top — pause and squeeze","Control descent — don't just drop the weight","Foot position: toes pointing up"],
+   mistakes:["Using too much weight and short range of motion","Swinging to initiate"],
+   youtubeQuery:"leg extension machine proper form"},
+  {id:"e038",name:"Romanian Deadlift",cat:"Legs",equipment:"Barbell or Dumbbells",difficulty:"Intermediate",
+   muscles:{primary:["hamstrings","glutes"],secondary:["back","core"]},
+   desc:"Hip hinge movement emphasizing hamstring stretch and glute activation. Bar stays close to legs.",
+   cues:["Soft bend in knees — they don't change angle","Push hips back — don't squat down","Feel hamstring stretch at bottom","Drive hips forward to return — like slamming a car door"],
+   mistakes:["Bending knees too much (becomes deadlift)","Rounding lower back","Bar drifting forward"],
+   youtubeQuery:"romanian deadlift RDL proper form"},
+  {id:"e039",name:"Hip Thrust",cat:"Legs",equipment:"Barbell + Bench",difficulty:"Beginner",
+   muscles:{primary:["glutes"],secondary:["hamstrings","core"]},
+   desc:"Upper back on bench, drive barbell skyward with hips. Unmatched glute activation.",
+   cues:["Bench at mid-shoulder blade height","Chin tucked throughout — don't hyperextend neck","Drive through heels","Squeeze glutes hard at top — 1 second hold","Don't arch lower back — tuck pelvis"],
+   mistakes:["Hyperextending spine at top","Pushing through toes not heels","Not squeezing glutes at peak"],
+   youtubeQuery:"hip thrust proper form barbell"},
+  {id:"e040",name:"Glute Bridge",cat:"Legs",equipment:"None or Barbell",difficulty:"Beginner",
+   muscles:{primary:["glutes"],secondary:["hamstrings","core"]},
+   desc:"Lying on floor, feet flat, drive hips up. Bodyweight or loaded. Great for beginners.",
+   cues:["Feet hip-width, 90 degree knee angle","Drive through heels","Squeeze glutes at top — full extension","Hold 1-2 seconds at peak"],
+   mistakes:["Not reaching full hip extension","Pushing through toes","Rushing through reps"],
+   youtubeQuery:"glute bridge form activation"},
+  {id:"e041",name:"Hamstring Curl (Machine)",cat:"Legs",equipment:"Leg Curl Machine",difficulty:"Beginner",
+   muscles:{primary:["hamstrings"],secondary:["calves"]},
+   desc:"Machine isolation for hamstrings. Lying or seated versions available.",
+   cues:["Full range of motion — both directions","Slow eccentric (lowering) — 3 sec down","Don't let hips rise off pad"],
+   mistakes:["Partial range of motion","Hips lifting to compensate"],
+   youtubeQuery:"hamstring curl machine form"},
+  {id:"e042",name:"Nordic Hamstring Curl",cat:"Legs",equipment:"Partner or Anchored Feet",difficulty:"Advanced",
+   muscles:{primary:["hamstrings"],secondary:["glutes","core"]},
+   desc:"Eccentric-focused hamstring exercise. Feet anchored, lower body toward floor using hamstrings only.",
+   cues:["Lower as slowly as possible — 4-6 seconds","Use hands to catch at bottom","Hips stay extended throughout","Build up very gradually — high injury risk if jumped into"],
+   mistakes:["Going too fast","Hips bending (hip flexion)"],
+   youtubeQuery:"nordic hamstring curl proper form"},
+  {id:"e043",name:"Calf Raise",cat:"Legs",equipment:"None or Machine",difficulty:"Beginner",
+   muscles:{primary:["calves"],secondary:[]},
+   desc:"Rise on toes, then lower fully below starting position. Full range of motion is key.",
+   cues:["Full range of motion — deep stretch at bottom","Pause at top — squeeze calves","Slow on the way down — 3 sec","Straight knee targets gastrocnemius; bent knee hits soleus"],
+   mistakes:["Partial range of motion","Bouncing at bottom","Too fast"],
+   youtubeQuery:"calf raise full range of motion"},
+  {id:"e044",name:"Lateral Band Walk",cat:"Legs",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["glutes"],secondary:["hip_flexors","quads"]},
+   desc:"Band around ankles or knees, step side to side in athletic stance. Activates glute medius.",
+   cues:["Maintain athletic stance throughout — slight hip hinge","Step and drag — don't let feet come together","Keep tension in band throughout","Same number of steps each direction"],
+   mistakes:["Feet coming together (losing tension)","Standing upright instead of athletic stance"],
+   youtubeQuery:"lateral band walk glute medius"},
+  {id:"e045",name:"Step-Up",cat:"Legs",equipment:"Box or Bench",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Step up onto box using one leg at a time. Functional unilateral leg exercise.",
+   cues:["Full foot on box — no heels hanging off","Drive through heel of elevated foot","Don't push off back foot","Step fully up before stepping down"],
+   mistakes:["Pushing off back foot to cheat up","Knee caving inward"],
+   youtubeQuery:"step up exercise proper form"},
+  {id:"e046",name:"Plank",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:["shoulders","glutes"]},
+   desc:"Anti-extension core stability exercise. Maintain rigid straight line from head to heel.",
+   cues:["Forearms or hands shoulder-width","Body forms straight line — don't sag or pike","Squeeze glutes and quads","Breathe — don't hold breath","Eyes at floor — neutral neck"],
+   mistakes:["Hips too high or too low","Holding breath","Neck cranked up or down"],
+   youtubeQuery:"plank proper form core stability"},
+  {id:"e047",name:"Side Plank",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:["shoulders","glutes"]},
+   desc:"Lateral core stability targeting obliques. Hold on forearm or hand.",
+   cues:["Body forms straight diagonal line","Stack feet or stagger for balance","Don't let hip sag to floor","Can add hip dip for extra work"],
+   mistakes:["Hip sagging down","Rotating forward or back"],
+   youtubeQuery:"side plank form obliques"},
+  {id:"e048",name:"Dead Bug",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:["hip_flexors"]},
+   desc:"Lying on back, extend opposite arm and leg while pressing lower back to floor.",
+   cues:["Press lower back FLAT to floor — this is the whole exercise","Move slowly — 3-4 sec per extension","Breathe out as you extend","Only go as far as you can keep back flat"],
+   mistakes:["Lower back arching off floor","Moving too fast","Arms and legs on same side"],
+   youtubeQuery:"dead bug exercise proper form lower back"},
+  {id:"e049",name:"Bird Dog",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:["glutes","back"]},
+   desc:"On all fours, extend opposite arm and leg maintaining level hips and spine.",
+   cues:["Don't rotate hips — keep them level","Move slowly and deliberately","Extend arm and leg fully","Return without touching floor between reps"],
+   mistakes:["Hip rotation (hiking one side up)","Extending too fast"],
+   youtubeQuery:"bird dog exercise proper form"},
+  {id:"e050",name:"Crunch",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:[]},
+   desc:"Spine flexion exercise targeting rectus abdominis. Short range of motion — shoulders to just off floor.",
+   cues:["Fingertips lightly behind ears — don't pull neck","Curl shoulders off floor — small controlled movement","Exhale as you crunch up","Lower slowly"],
+   mistakes:["Pulling on neck","Full sit-up motion","Not exhaling at top"],
+   youtubeQuery:"crunch ab exercise proper form no neck pull"},
+  {id:"e051",name:"Bicycle Crunch",cat:"Core",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:[]},
+   desc:"Alternating elbow to knee crunch with cycling legs. Works rectus abdominis and obliques.",
+   cues:["Slow and controlled — not a race","Full rotation — elbow reaches opposite knee","Keep lower back pressed to floor","Don't pull neck"],
+   mistakes:["Moving too fast losing control","Pulling neck","Elbows just bobbing, not rotating"],
+   youtubeQuery:"bicycle crunch form obliques"},
+  {id:"e052",name:"Russian Twist",cat:"Core",equipment:"None or Weight",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:[]},
+   desc:"Seated rotation exercise for obliques. Feet on floor or elevated.",
+   cues:["Lean back to about 45 degrees — activate core","Slow rotation — 2 sec each side","Feet elevated for harder version","Add weight plate, medicine ball, or dumbbell"],
+   mistakes:["Moving only arms — rotate torso","Too fast"],
+   youtubeQuery:"russian twist obliques form"},
+  {id:"e053",name:"Hanging Leg Raise",cat:"Core",equipment:"Pull-Up Bar",difficulty:"Intermediate",
+   muscles:{primary:["core","hip_flexors"],secondary:[]},
+   desc:"Hanging from bar, raise legs to 90 degrees or higher. Intense lower ab exercise.",
+   cues:["Control the swing — no kipping","Raise knees or straight legs depending on strength","Lower slowly — don't just drop legs","Tuck pelvis under at top for full ab contraction"],
+   mistakes:["Using momentum to swing","Dropping legs fast","Not controlling range of motion"],
+   youtubeQuery:"hanging leg raise form lower abs"},
+  {id:"e054",name:"Ab Wheel Rollout",cat:"Core",equipment:"Ab Wheel",difficulty:"Advanced",
+   muscles:{primary:["core"],secondary:["shoulders","lats"]},
+   desc:"Roll wheel forward from knees or standing — tests full anterior core stability.",
+   cues:["Start on knees","Brace core maximally before moving","Go only as far as you can maintain a straight back","Roll back in — don't collapse and drag"],
+   mistakes:["Going too far before ready","Lower back arching/sagging","Moving too fast"],
+   youtubeQuery:"ab wheel rollout form beginner"},
+  {id:"e055",name:"Cable Rotation",cat:"Core",equipment:"Cable Machine",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:["shoulders"]},
+   desc:"Standing cable rotation training rotational power and oblique strength.",
+   cues:["Feet shoulder-width, slight bend in knees","Rotate from hips — not just arms","Maintain arm position — let torso do the work","Same reps each direction"],
+   mistakes:["Using only arms","Feet pivoting too much"],
+   youtubeQuery:"cable rotation core form"},
+  {id:"e056",name:"Treadmill Run",cat:"Cardio",equipment:"Treadmill",difficulty:"Beginner",
+   muscles:{primary:["full_body"],secondary:["calves","quads","hamstrings"]},
+   desc:"Continuous running on treadmill. Pace and incline control intensity.",
+   cues:["Land midfoot — not heel striking","Upright posture — slight forward lean from ankles","Arms at 90 degrees, drive backward","Breathe rhythmically — 2 steps in, 2 out"],
+   mistakes:["Holding rails","Overstriding (heel striking)","Looking down"],
+   youtubeQuery:"treadmill running proper form"},
+  {id:"e057",name:"Treadmill Incline Walk",cat:"Cardio",equipment:"Treadmill",difficulty:"Beginner",
+   muscles:{primary:["glutes","calves","hamstrings"],secondary:["core"]},
+   desc:"Walking at elevated incline. Burns significant calories without joint impact of running.",
+   cues:["Don't hold handrails — defeats the purpose","Lean slightly into incline","Natural walking stride","3-8% incline at 3-4 mph is a great target"],
+   mistakes:["Holding rails (reduces calorie burn by ~40%)","Leaning back"],
+   youtubeQuery:"incline treadmill walk dont hold rails"},
+  {id:"e058",name:"Elliptical Trainer",cat:"Cardio",equipment:"Elliptical",difficulty:"Beginner",
+   muscles:{primary:["full_body"],secondary:["quads","hamstrings","glutes","shoulders"]},
+   desc:"Low-impact cardio machine simulating running without joint stress. Great for recovery days.",
+   cues:["Use arm handles — push and pull actively","Maintain upright posture","Drive through heels","Resistance should make it feel like work"],
+   mistakes:["Only moving legs — ignoring arms","Hunching over handles","Too low resistance"],
+   youtubeQuery:"elliptical machine proper form"},
+  {id:"e059",name:"Stationary Bike",cat:"Cardio",equipment:"Stationary Bike",difficulty:"Beginner",
+   muscles:{primary:["quads","hamstrings","calves"],secondary:["glutes"]},
+   desc:"Seated or standing cycling. Extremely low impact — ideal for injury recovery.",
+   cues:["Seat height: slight bend in knee at bottom of pedal stroke","Upright posture — don't hunch","Pedal in smooth circles, not just push down"],
+   mistakes:["Seat too low (knee pain)","Bouncing on the seat"],
+   youtubeQuery:"stationary bike seat height proper form"},
+  {id:"e060",name:"Jump Rope",cat:"Cardio",equipment:"Jump Rope",difficulty:"Beginner",
+   muscles:{primary:["calves","full_body"],secondary:["shoulders","core"]},
+   desc:"Jumping rope builds coordination, cardio, and calf strength. Highly efficient calorie burner.",
+   cues:["Jump from the balls of your feet","Land softly — slight knee bend","Keep elbows close to body","Small wrist circles — not arms","Jump only 1-2 inches off ground"],
+   mistakes:["Jumping too high","Jumping flat-footed","Big arm movements"],
+   youtubeQuery:"jump rope proper form beginners"},
+  {id:"e061",name:"Sprint Intervals",cat:"Cardio",equipment:"None",difficulty:"Intermediate",
+   muscles:{primary:["full_body"],secondary:["quads","hamstrings","glutes","calves"]},
+   desc:"Maximum effort running sprints with rest periods. Most effective fat loss and conditioning tool.",
+   cues:["Warm up 10 min before any sprinting","True max effort on work intervals","Full recovery between sets","Focus on driving arms — back pocket to cheek"],
+   mistakes:["Not actually sprinting — staying at fast jog","Insufficient rest","Skipping warm-up"],
+   youtubeQuery:"sprint interval training HIIT form"},
+  {id:"e062",name:"Rowing Machine",cat:"Cardio",equipment:"Rowing Machine",difficulty:"Beginner",
+   muscles:{primary:["back","full_body"],secondary:["legs","core","arms"]},
+   desc:"Full body cardio hitting 86% of muscles. Power sequence: legs, core, arms.",
+   cues:["Drive sequence: LEGS first, then lean back, then pull arms","Return sequence: arms first, then lean forward, then bend knees","1:2 drive-to-recovery ratio","Don't hunch at catch"],
+   mistakes:["Leading with back not legs","Rushing the recovery","Hunching over at catch"],
+   youtubeQuery:"rowing machine proper form technique"},
+  {id:"e063",name:"Burpee",cat:"HIIT",equipment:"None",difficulty:"Intermediate",
+   muscles:{primary:["full_body"],secondary:[]},
+   desc:"Squat-thrust-jump combination. One of the most demanding and effective bodyweight exercises.",
+   cues:["From stand: squat down, jump feet back to plank, do push-up, jump feet to hands, jump up with arms overhead","Modify by stepping instead of jumping if needed","Breathe out on the jump","Maintain plank position in push-up portion"],
+   mistakes:["Sagging in plank","No push-up at bottom","Sloppy landing"],
+   youtubeQuery:"burpee proper form all levels"},
+  {id:"e064",name:"Box Jump",cat:"HIIT",equipment:"Plyo Box",difficulty:"Intermediate",
+   muscles:{primary:["quads","glutes"],secondary:["calves","core"]},
+   desc:"Jump from floor onto box using both legs. Develops explosive power.",
+   cues:["Start in quarter squat, swing arms back","Explode up — pull knees up as you jump","Land softly — quarter squat landing","Step down — don't jump down (joint stress)","Full extension at top"],
+   mistakes:["Landing with straight knees (huge injury risk)","Jumping down from height","Not swinging arms"],
+   youtubeQuery:"box jump proper form landing mechanics"},
+  {id:"e065",name:"Jump Squat",cat:"HIIT",equipment:"None",difficulty:"Intermediate",
+   muscles:{primary:["quads","glutes"],secondary:["calves","core"]},
+   desc:"Squat with explosive jump at top. Builds lower body power and cardio.",
+   cues:["Squat to parallel","Explode upward — fully extend hips knees ankles","Land with soft knees — immediately descend into next squat","Arms swing for momentum"],
+   mistakes:["Landing stiff-legged","Not reaching squat depth"],
+   youtubeQuery:"jump squat proper form landing"},
+  {id:"e066",name:"Mountain Climber",cat:"HIIT",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["core","hip_flexors"],secondary:["shoulders","chest"]},
+   desc:"In plank position, alternate driving knees to chest in running motion.",
+   cues:["Maintain flat plank — don't let hips rise","Drive knees fully under chest","Breathe rhythmically","Can do slow controlled or fast for cardio"],
+   mistakes:["Hips piking up","Not driving knee fully forward"],
+   youtubeQuery:"mountain climbers proper form core"},
+  {id:"e067",name:"High Knees",cat:"HIIT",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["hip_flexors","quads"],secondary:["calves","core"]},
+   desc:"Running in place driving knees high to waist level. Excellent cardio warm-up or HIIT finisher.",
+   cues:["Drive knees to hip height","Pump arms in opposition","Stay on balls of feet","Maintain upright posture"],
+   mistakes:["Leaning back","Low knee height","Flat-footed landing"],
+   youtubeQuery:"high knees exercise form cardio"},
+  {id:"e068",name:"Jumping Jack",cat:"HIIT",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["full_body"],secondary:["calves","shoulders"]},
+   desc:"Classic total body warm-up and cardio movement.",
+   cues:["Land softly","Full arm extension overhead","Jump feet wide — shoulder width or wider"],
+   mistakes:["Landing flat-footed with hard impact","Incomplete arm extension"],
+   youtubeQuery:"jumping jacks proper form"},
+  {id:"e069",name:"Battle Ropes",cat:"HIIT",equipment:"Battle Ropes",difficulty:"Intermediate",
+   muscles:{primary:["shoulders","back","core"],secondary:["arms","legs"]},
+   desc:"Alternating or simultaneous wave patterns with heavy ropes. Brutal upper body and cardio.",
+   cues:["Athletic stance — knees bent, hip hinge","Drive waves all the way to the anchor","Keep rhythm — don't let waves die halfway","Breathe continuously"],
+   mistakes:["Standing upright","Stopping before the anchor","Holding breath"],
+   youtubeQuery:"battle ropes workout form waves"},
+  {id:"e070",name:"Kettlebell Swing",cat:"Kettlebell",equipment:"Kettlebell",difficulty:"Intermediate",
+   muscles:{primary:["glutes","hamstrings","back"],secondary:["core","shoulders"]},
+   desc:"Hip hinge ballistic movement swinging kettlebell from between legs to shoulder height.",
+   cues:["It's a HIP HINGE — not a squat","Hike bell back between legs like a football snap","Explosive hip snap forward — don't use arms to raise bell","Bell floats at top — you're not pressing it","Hinge on the downswing — don't squat"],
+   mistakes:["Squatting the swing","Using arms to lift the bell","Bending knees too much"],
+   youtubeQuery:"kettlebell swing hip hinge proper form"},
+  {id:"e071",name:"Kettlebell Goblet Squat",cat:"Kettlebell",equipment:"Kettlebell",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["core","hamstrings"]},
+   desc:"Hold kettlebell by horns at chest, squat deep. Excellent for squat pattern learning.",
+   cues:["Elbows inside knees at bottom","Chest up throughout","Full depth — hip crease below parallel","Drive knees out during ascent"],
+   mistakes:["Forward lean","Elbows bowing out","Partial depth"],
+   youtubeQuery:"kettlebell goblet squat form"},
+  {id:"e072",name:"Kettlebell Turkish Get-Up",cat:"Kettlebell",equipment:"Kettlebell",difficulty:"Advanced",
+   muscles:{primary:["full_body"],secondary:["core","shoulders","glutes"]},
+   desc:"Stand up from lying position while keeping kettlebell pressed overhead at all times.",
+   cues:["Eye stays on the kettlebell at all times","Move deliberately — never rush this movement","Learn each phase separately first","Pack the shoulder — keep it stable"],
+   mistakes:["Looking away from bell","Rushing any phase","Unstable shoulder"],
+   youtubeQuery:"kettlebell turkish get up step by step"},
+  {id:"e073",name:"Kettlebell Clean",cat:"Kettlebell",equipment:"Kettlebell",difficulty:"Intermediate",
+   muscles:{primary:["glutes","back","shoulders"],secondary:["core","hamstrings"]},
+   desc:"Swing bell up and rack it at shoulder in one fluid motion.",
+   cues:["Hike between legs like a swing","Zip the bell up close to the body","Rotate elbow under bell as it rises","Soft landing — bell doesn't bang wrist"],
+   mistakes:["Bell bashing wrist","Swinging bell out wide","Muscling it up with arm"],
+   youtubeQuery:"kettlebell clean proper form no wrist bang"},
+  {id:"e074",name:"Kettlebell Press",cat:"Kettlebell",equipment:"Kettlebell",difficulty:"Intermediate",
+   muscles:{primary:["shoulders"],secondary:["triceps","core"]},
+   desc:"Press kettlebell overhead from racked position. Challenges stability differently than dumbbell.",
+   cues:["Start from clean/rack position","Press straight up — bell tracks over shoulder","Lat stays engaged throughout","Don't lean away from the bell"],
+   mistakes:["Pressing out in front","Losing core tightness"],
+   youtubeQuery:"kettlebell press proper form"},
+  {id:"e075",name:"Medicine Ball Slam",cat:"Medicine Ball",equipment:"Medicine Ball",difficulty:"Beginner",
+   muscles:{primary:["core","back","shoulders"],secondary:["quads","glutes"]},
+   desc:"Raise ball overhead, slam down with full force. Great power and aggression release.",
+   cues:["Full extension overhead before slamming","Use whole body — hinge into the slam","Catch the bounce or pick up","Keep core tight throughout"],
+   mistakes:["Using only arms","Not reaching full overhead extension","Letting ball hit feet"],
+   youtubeQuery:"medicine ball slam proper form"},
+  {id:"e076",name:"Med Ball Rotational Throw",cat:"Medicine Ball",equipment:"Medicine Ball + Wall",difficulty:"Intermediate",
+   muscles:{primary:["core"],secondary:["shoulders","back"]},
+   desc:"Rotational throw against wall or with partner. Builds rotational power for sports.",
+   cues:["Load the rotation — coil back first","Drive from hips — not just arms","Full follow-through","Catch and immediately reload"],
+   mistakes:["Using only arms","No hip rotation"],
+   youtubeQuery:"medicine ball rotational throw wall"},
+  {id:"e077",name:"Med Ball Russian Twist",cat:"Medicine Ball",equipment:"Medicine Ball",difficulty:"Beginner",
+   muscles:{primary:["core"],secondary:[]},
+   desc:"Russian twist with medicine ball for added resistance.",
+   cues:["Lean back 45 degrees","Slow controlled rotation — both sides","Touch ball to floor each side or keep elevated"],
+   mistakes:["Only moving arms","Too fast"],
+   youtubeQuery:"medicine ball russian twist form"},
+  {id:"e078",name:"Med Ball V-Up Pass",cat:"Medicine Ball",equipment:"Medicine Ball",difficulty:"Intermediate",
+   muscles:{primary:["core"],secondary:["hip_flexors"]},
+   desc:"Lying flat, crunch up and pass ball from hands to feet and back.",
+   cues:["Full extension before each crunch","Slow and controlled — no flinging","Core stays engaged throughout"],
+   mistakes:["Momentum-based","Partial range of motion"],
+   youtubeQuery:"medicine ball v up pass ab exercise"},
+  {id:"e079",name:"Band Pull Apart",cat:"Resistance Band",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["back","shoulders"],secondary:["traps"]},
+   desc:"Hold band with straight arms at shoulder height, pull apart to full extension. Shoulder health essential.",
+   cues:["Keep arms at shoulder height throughout","Pull to full extension — band at chest","Control the return","Can do palms up (more external rotation) or palms down"],
+   mistakes:["Arms dropping during movement","Partial range of motion"],
+   youtubeQuery:"band pull apart shoulder health form"},
+  {id:"e080",name:"Band Squat",cat:"Resistance Band",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Stand on band, hold ends at shoulders or overhead, perform squat.",
+   cues:["Full squat depth","Knees track over toes","Core braced throughout"],
+   mistakes:["Band slipping","Partial depth"],
+   youtubeQuery:"resistance band squat form"},
+  {id:"e081",name:"Band Row",cat:"Resistance Band",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["back","lats"],secondary:["biceps"]},
+   desc:"Anchor band, pull toward abdomen. Mimics cable row with anywhere setup.",
+   cues:["Sit tall or stand in hip hinge","Pull to lower abdomen","Squeeze shoulder blades together"],
+   mistakes:["Rounding forward on each rep"],
+   youtubeQuery:"resistance band row proper form"},
+  {id:"e082",name:"Band Glute Kickback",cat:"Resistance Band",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["glutes"],secondary:["hamstrings"]},
+   desc:"On all fours with band around ankles, kick one leg back and up.",
+   cues:["Keep hips square — no rotation","Squeeze glute hard at top","Controlled movement — not swinging","Flat back throughout"],
+   mistakes:["Hip rotation","Using momentum to swing leg"],
+   youtubeQuery:"resistance band glute kickback form"},
+  {id:"e083",name:"Band Clamshell",cat:"Resistance Band",equipment:"Resistance Band",difficulty:"Beginner",
+   muscles:{primary:["glutes"],secondary:["hip_flexors"]},
+   desc:"Lying on side with band around knees, rotate top knee open like a clamshell. Glute medius activation.",
+   cues:["Don't let hips roll backward","Open as far as flexibility allows","Slow controlled movement","Great for warm-up or rehab"],
+   mistakes:["Rolling hips back to get more range","Moving too fast"],
+   youtubeQuery:"clamshell exercise band glute medius form"},
+  {id:"e084",name:"Bodyweight Squat",cat:"Bodyweight",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Fundamental movement pattern. Squat with arms forward for balance.",
+   cues:["Feet shoulder-width, toes slightly out","Sit back and down — chest stays up","Knees track over toes","Full depth — hip crease below parallel"],
+   mistakes:["Knees caving in","Excessive forward lean","Partial depth"],
+   youtubeQuery:"bodyweight squat proper form"},
+  {id:"e085",name:"Inverted Row",cat:"Bodyweight",equipment:"Barbell in Rack or Table",difficulty:"Beginner",
+   muscles:{primary:["back","lats"],secondary:["biceps","core"]},
+   desc:"Lie under bar, grip and pull chest to bar. Bodyweight row — scalable pulling exercise.",
+   cues:["Keep body rigid like a plank","Pull chest to bar — not chin","Elbows drive back past torso","Higher bar = easier; lower bar = harder"],
+   mistakes:["Sagging hips","Pulling only with arms"],
+   youtubeQuery:"inverted row proper form bodyweight"},
+  {id:"e086",name:"Pike Push-Up",cat:"Bodyweight",equipment:"None",difficulty:"Intermediate",
+   muscles:{primary:["shoulders"],secondary:["triceps","core"]},
+   desc:"Inverted V position push-up targeting shoulders. Progression toward handstand push-up.",
+   cues:["Hips high — inverted V shape","Lower head toward floor","Elbows track slightly outward","Full range of motion"],
+   mistakes:["Hips too low (becomes regular push-up)","Partial range"],
+   youtubeQuery:"pike push up shoulder workout form"},
+  {id:"e087",name:"Chair Squat",cat:"Bodyweight",equipment:"Chair",difficulty:"Beginner",
+   muscles:{primary:["quads","glutes"],secondary:["hamstrings","core"]},
+   desc:"Squat down to sit on chair, stand back up. Excellent for beginners and elderly clients.",
+   cues:["Stand in front of chair","Lower slowly — 3 count","Touch chair lightly — don't plop down","Press through heels to stand","Arms out front for balance"],
+   mistakes:["Plopping down onto chair","Leaning too far forward"],
+   youtubeQuery:"chair squat beginner form elderly"},
+  {id:"e088",name:"Wall Sit",cat:"Bodyweight",equipment:"Wall",difficulty:"Beginner",
+   muscles:{primary:["quads"],secondary:["glutes","calves"]},
+   desc:"Back flat against wall, thighs parallel to floor. Isometric quad hold.",
+   cues:["90 degrees at knees AND hips","Feet directly under knees","Back flat against wall","Arms can rest on thighs"],
+   mistakes:["Knees going past toes","Back away from wall","Not reaching 90 degrees"],
+   youtubeQuery:"wall sit proper form isometric"},
+  {id:"e089",name:"Superman Hold",cat:"Bodyweight",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["back","glutes"],secondary:["hamstrings"]},
+   desc:"Lying face down, raise arms, chest and legs simultaneously. Lower back and glute strengthener.",
+   cues:["Look at floor — don't crank neck up","Squeeze glutes as you lift","Hold at top 1-2 seconds","Arms overhead like superman flying"],
+   mistakes:["Cranking neck up","Not squeezing glutes"],
+   youtubeQuery:"superman exercise lower back proper form"},
+  {id:"e090",name:"Hip Flexor Stretch",cat:"Flexibility",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["hip_flexors"],secondary:["quads"]},
+   desc:"Kneeling lunge stretch targeting the hip flexors — commonly tight from sitting.",
+   cues:["Back knee on floor","Drive hip forward while keeping torso upright","Feel stretch in front of back hip","Hold 30-60 seconds each side"],
+   mistakes:["Leaning forward instead of driving hip forward","Not holding long enough"],
+   youtubeQuery:"hip flexor stretch kneeling proper form"},
+  {id:"e091",name:"Hamstring Stretch",cat:"Flexibility",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["hamstrings"],secondary:[]},
+   desc:"Standing or seated hamstring stretch. Essential for posterior chain flexibility.",
+   cues:["Hinge from hip — not rounding back","Keep slight bend in knee","Feel stretch in back of thigh","Don't force bounce"],
+   mistakes:["Rounding back instead of hip hinge","Bouncing into stretch"],
+   youtubeQuery:"hamstring stretch standing seated proper form"},
+  {id:"e092",name:"Thoracic Spine Rotation",cat:"Flexibility",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["back"],secondary:["core"]},
+   desc:"Seated or lying rotation of upper spine. Critical for shoulder health and posture.",
+   cues:["Isolate upper back — don't rotate from hips","Slow deliberate movement","Each direction same range of motion"],
+   mistakes:["Rotating from hips","Forcing range"],
+   youtubeQuery:"thoracic spine rotation mobility exercise"},
+  {id:"e093",name:"World's Greatest Stretch",cat:"Flexibility",equipment:"None",difficulty:"Beginner",
+   muscles:{primary:["hip_flexors","hamstrings"],secondary:["back","shoulders","core"]},
+   desc:"Dynamic movement hitting hip flexors, hamstrings, thoracic spine and shoulders in one sequence.",
+   cues:["Start in lunge position","Place same-side elbow to floor inside front foot","Rotate top arm to ceiling","Rock forward to stretch hip flexor"],
+   mistakes:["Rushing through positions","Not reaching full range"],
+   youtubeQuery:"worlds greatest stretch morning routine"},
+  {id:"e094",name:"Hill Sprint",cat:"Outdoor",equipment:"Hill",difficulty:"Intermediate",
+   muscles:{primary:["glutes","quads","hamstrings"],secondary:["calves","core"]},
+   desc:"Sprint up a hill at maximum effort. Higher intensity than flat sprints with lower joint impact.",
+   cues:["Drive arms hard — they power the legs","Lean into the hill slightly","Full sprint effort — not jogging","Walk back down for full recovery"],
+   mistakes:["Not sprinting — just jogging up","Insufficient recovery between reps"],
+   youtubeQuery:"hill sprint workout proper form"},
+  {id:"e095",name:"Tire Flip",cat:"Outdoor",equipment:"Heavy Tire",difficulty:"Intermediate",
+   muscles:{primary:["glutes","quads","back"],secondary:["shoulders","core","arms"]},
+   desc:"Flip heavy tire using a deadlift-to-push motion. Full body power and conditioning.",
+   cues:["Fingers under tire rim — not on top","Drive with legs first — hip hinge, then extend","As tire rises, reposition hands to push","Full hip extension to drive tire over"],
+   mistakes:["Using back not legs to initiate","Fingers over rim (dangerous)"],
+   youtubeQuery:"tire flip proper form technique"},
+  {id:"e096",name:"Sandbag Carry",cat:"Outdoor",equipment:"Sandbag",difficulty:"Beginner",
+   muscles:{primary:["core","back","shoulders"],secondary:["quads","glutes"]},
+   desc:"Carry loaded sandbag for distance or time. Farmer carry variant with unstable load.",
+   cues:["Hug bag to chest or bear hug","Brace core throughout","Upright posture — resist the load pulling you down","Steady breathing"],
+   mistakes:["Rounding forward","Holding breath"],
+   youtubeQuery:"sandbag carry workout functional fitness"},
+  {id:"e097",name:"Tree Branch Pull-Up",cat:"Outdoor",equipment:"Tree Branch",difficulty:"Intermediate",
+   muscles:{primary:["lats","back"],secondary:["biceps","core"]},
+   desc:"Pull-ups using a sturdy tree branch. Test branch weight capacity first.",
+   cues:["Choose a branch that can handle 1.5-2x your bodyweight","Grip with thumb wrapped around branch","Same form as standard pull-up","Branch may give some — adapt your grip"],
+   mistakes:["Using weak or thin branch","Not testing stability first"],
+   youtubeQuery:"outdoor pull up tree natural fitness"},
+  {id:"e098",name:"Log Press",cat:"Outdoor",equipment:"Heavy Log",difficulty:"Advanced",
+   muscles:{primary:["shoulders","triceps"],secondary:["core","back"]},
+   desc:"Clean and press a heavy log overhead. Requires grip, core and pressing strength.",
+   cues:["Find flat, even ends for grip","Clean to shoulder height first","Press straight up while bracing core"],
+   mistakes:["Not clearing clean before press","Unstable footing"],
+   youtubeQuery:"log press strongman form outdoor"},
+  {id:"e099",name:"Tree Climb",cat:"Outdoor",equipment:"Tree",difficulty:"Intermediate",
+   muscles:{primary:["back","lats","biceps"],secondary:["core","forearms","shoulders"]},
+   desc:"Climbing a sturdy tree using arms and legs. Functional grip, pulling and coordination training.",
+   cues:["Choose a tree with stable branches","3 points of contact at all times","Pull with back — not just arms","Use legs and trunk squeeze to assist"],
+   mistakes:["Only using arms","Moving too fast","Choosing unstable trees"],
+   youtubeQuery:"tree climbing technique fitness outdoor"},
+  {id:"e100",name:"Park Bench Dip",cat:"Outdoor",equipment:"Park Bench",difficulty:"Beginner",
+   muscles:{primary:["triceps","chest"],secondary:["shoulders"]},
+   desc:"Tricep dips off park bench edge. Same mechanics as bar dips — free outdoor gym.",
+   cues:["Hands shoulder-width on bench edge","Slide hips off bench","Lower until elbows at 90 degrees","Press back up — full extension"],
+   mistakes:["Bench too slippery","Going too deep","Flaring elbows"],
+   youtubeQuery:"park bench tricep dip outdoor workout"}
+];
+
+
+
+// WORKOUT_LOGS[clientId] = [{date,day,sessionId,started,completed,exercises:[{exIdx,setIdx,startedAt,completedAt,repsActual,weightActual}]}]
+var WORKOUT_LOGS = {};
+
+// ── STATE ─────────────────────────────────────────────────────────────
+var LIB_PICKER_CID = null;  // always null — read-only mode, no picker
+
+// ── MODAL helpers ────────────────────────────────────────────────────
+function openModal(html) {
+  document.getElementById("modal-content").innerHTML = html;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModalDirect() {
+  document.getElementById("modal").classList.remove("open");
+}
+document.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("modal").addEventListener("click", closeModal);
+});
+
+// ── FUNCTIONS ────────────────────────────────────────────────────────
+
+function getClient(id) {
+  for(var i=0;i<CLIENTS.length;i++) { if(CLIENTS[i].id===id) return CLIENTS[i]; }
+  return null;
+}
+
+
+function diffColor(d) {
+  return d==='Beginner'?'var(--grn)':d==='Intermediate'?'var(--gold)':'var(--acc)';
+}
+
+function getAllExercises() {
+  return EXERCISE_LIB.concat(CUSTOM_EXERCISES);
+}
+
+
+function getFilteredExercises() {
+  var all = getAllExercises();
+  var s = LIB_SEARCH.trim().toLowerCase();
+  return all.filter(function(e) {
+    var catMatch = LIB_CAT === 'All' || e.cat === LIB_CAT;
+    var searchMatch = !s || e.name.toLowerCase().indexOf(s) > -1
+      || e.cat.toLowerCase().indexOf(s) > -1
+      || (e.muscles.primary||[]).join(' ').toLowerCase().indexOf(s) > -1
+      || (e.desc||'').toLowerCase().indexOf(s) > -1;
+    return catMatch && searchMatch;
+  });
+}
+
+
+function renderLibrary() {
+  var filtered = getFilteredExercises();
+  var isPickerMode = !!LIB_PICKER_CID;
+
+  var html = '';
+
+  // Header
+  html += '<div class="card mb10" style="background:linear-gradient(135deg,rgba(61,158,255,.1),var(--card));border-color:rgba(61,158,255,.3);padding:14px 16px;">'
+    + '<div class="bold txt-blue mb2" style="font-size:13px;text-transform:uppercase;letter-spacing:.5px;">📚 Exercise Library</div>'
+    + '<div class="sub f12">'+(isPickerMode?'Select an exercise to add to <strong>'+getClient(LIB_PICKER_CID).name+'\'s</strong> '+PORTAL_EDIT_DAY+' program':''+getAllExercises().length+' exercises · tap any to view full guide + muscle map')+'</div>'
+    + '</div>';
+
+  if(isPickerMode) {
+    html += '<button class="btn btn-ghost btn-sm mb10" onclick="LIB_PICKER_CID=null;showScreen(\'schedule\',document.querySelector(\'.nav-tab[onclick*=schedule]\'));">← Back to Program</button>';
+  }
+
+  // View toggle (browse vs custom builder)
+  if(!isPickerMode) {
+    html += '<div class="row mb10" style="gap:8px;">'
+      + '<button class="cal-view-btn'+(LIB_VIEW==='browse'?' active':'')+'" onclick="LIB_VIEW=\'browse\';renderLibrary()">Browse</button>'
+      + '<button class="cal-view-btn'+(LIB_VIEW==='custom'?' active':'')+'" onclick="LIB_VIEW=\'custom\';renderLibrary()">➕ My Exercises ('+CUSTOM_EXERCISES.length+')</button>'
+      + '</div>';
+  }
+
+  if(LIB_VIEW === 'custom' && !isPickerMode) {
+    html += renderCustomExercisePanel();
+  } else {
+    // Search bar
+    html += '<input class="inp mb10" id="lib-search" placeholder="🔍 Search by name, muscle, or equipment..." value="'+esc(LIB_SEARCH)+'" oninput="LIB_SEARCH=this.value;renderLibrary();">';
+
+    // Category pills
+    html += '<div class="row wrap mb12" style="gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
+    LIB_CATS.forEach(function(cat) {
+      html += '<button class="lib-cat-pill'+(LIB_CAT===cat?' active':'')+'" onclick="LIB_CAT=\''+cat+'\';renderLibrary()">'+cat+'</button>';
+    });
+    html += '</div>';
+
+    // Results count
+    html += '<div class="sub f12 mb8" style="padding:0 2px;">'+filtered.length+' exercise'+(filtered.length!==1?'s':'')+''+(LIB_SEARCH||LIB_CAT!=='All'?' found':'')+'</div>';
+
+    if(filtered.length === 0) {
+      html += '<div class="card center" style="padding:30px;border-style:dashed;">'
+        + '<div style="font-size:32px;margin-bottom:8px;">🤷</div>'
+        + '<div class="bold mb4">No exercises found</div>'
+        + '<div class="sub f12">Try a different search or category — or add your own custom exercise.</div>'
+        + '<button class="btn btn-ghost btn-sm mt10" onclick="LIB_SEARCH=\'\';LIB_CAT=\'All\';renderLibrary()">Clear filters</button>'
+        + '</div>';
+    } else {
+      html += '<div class="col" style="gap:8px;">';
+      filtered.forEach(function(ex) {
+        var primMuscles = (ex.muscles.primary||[]).join(', ').replace(/_/g,' ');
+        var secMuscles  = (ex.muscles.secondary||[]).join(', ').replace(/_/g,' ');
+        var isCustom = !!ex.custom;
+        html += '<div class="ex-card" onclick="'+(isPickerMode?'pickExercise(\''+ex.id+'\')':'openExerciseDetail(\''+ex.id+'\')')+'">'
+          + '<div class="row-sb">'
+          + '<div class="ex-name">'+esc(ex.name)+(isCustom?'<span class="custom-badge">CUSTOM</span>':'')+' <span style="font-size:11px;color:var(--mut);">'+esc(ex.equipment)+'</span></div>'
+          + '<span style="font-size:10px;font-weight:700;color:'+diffColor(ex.difficulty)+';white-space:nowrap;">'+ex.difficulty+'</span>'
+          + '</div>'
+          + '<div class="ex-tags">'
+          + '<span class="ex-tag cat">'+esc(ex.cat)+'</span>'
+          + (ex.muscles.primary||[]).map(function(m){ return '<span class="ex-tag muscle">'+m.replace(/_/g,' ')+'</span>'; }).join('')
+          + '</div>'
+          + '<div class="sub f11 mt6" style="line-height:1.45;">'+esc((ex.desc||'').substring(0,90))+(ex.desc&&ex.desc.length>90?'...':'')+'</div>'
+          + (isPickerMode?'<button class="btn btn-primary btn-sm mt8" onclick="event.stopPropagation();pickExercise(\''+ex.id+'\')">+ Add to Program</button>':'')
+          + '</div>';
+      });
+      html += '</div>';
+    }
+  }
+
+  document.getElementById('screen-library').innerHTML = html;
+  // Re-focus search bar if it exists
+  var sb = document.getElementById('lib-search');
+  if(sb && document.activeElement !== sb) { /* don't steal focus */ }
+}
+
+
+function openExerciseDetail(exId) {
+  var all = getAllExercises();
+  var ex = null;
+  for(var i=0;i<all.length;i++) { if(all[i].id===exId){ ex=all[i]; break; } }
+  if(!ex) return;
+
+  var primColors = {};
+  var secColors  = {};
+  (ex.muscles.primary||[]).forEach(function(m){ primColors[m]=true; });
+  (ex.muscles.secondary||[]).forEach(function(m){ secColors[m]=true; });
+
+  var html = ''
+    + '<div class="row-sb mb6">'
+    + '<div><div class="bold" style="font-size:20px;line-height:1.1;">'+esc(ex.name)+(ex.custom?'<span class="custom-badge ml6">CUSTOM</span>':'')+'</div>'
+    + '<div class="sub f12 mt2">'+esc(ex.cat)+' · '+esc(ex.equipment)+'</div></div>'
+    + '<span style="font-size:12px;font-weight:800;color:'+diffColor(ex.difficulty)+';">'+ex.difficulty+'</span>'
+    + '</div>'
+
+    // Muscle tags
+    + '<div class="row wrap mb12" style="gap:5px;">'
+    + '<span style="font-size:11px;font-weight:700;color:var(--mut);">PRIMARY:</span>'
+    + (ex.muscles.primary||[]).map(function(m){
+        return '<span style="font-size:11px;font-weight:700;background:'+MUSCLE_COLORS[m]+'22;color:'+MUSCLE_COLORS[m]+';padding:2px 9px;border-radius:10px;">'+m.replace(/_/g,' ')+'</span>';
+      }).join('')
+    + (ex.muscles.secondary&&ex.muscles.secondary.length?'<span style="font-size:11px;font-weight:700;color:var(--mut);margin-left:4px;">SEC:</span>':'')
+    + (ex.muscles.secondary||[]).map(function(m){
+        return '<span style="font-size:11px;font-weight:700;background:rgba(255,179,0,.15);color:var(--gold);padding:2px 9px;border-radius:10px;">'+m.replace(/_/g,' ')+'</span>';
+      }).join('')
+    + '</div>'
+
+    // Muscle diagram
+    + buildMuscleSVG(ex.muscles.primary||[], ex.muscles.secondary||[])
+
+    // Legend
+    + '<div class="row wrap mt6 mb12" style="gap:10px;justify-content:center;">'
+    + '<span style="font-size:10px;font-weight:700;"><span style="color:var(--acc);">■</span> Primary</span>'
+    + '<span style="font-size:10px;font-weight:700;"><span style="color:var(--gold);">■</span> Secondary</span>'
+    + '<span style="font-size:10px;font-weight:700;"><span style="color:#2a2a3a;background:#2a2a3a;border:1px solid #444;display:inline-block;width:8px;height:8px;vertical-align:middle;border-radius:1px;"></span> Not worked</span>'
+    + '</div>'
+
+    // Description
+    + '<div class="card mb10" style="padding:12px 14px;">'
+    + '<div class="bold f12 mb4" style="text-transform:uppercase;letter-spacing:.4px;color:var(--mut);">What It Is</div>'
+    + '<div class="f13" style="line-height:1.65;">'+esc(ex.desc)+'</div>'
+    + '</div>'
+
+    // Coaching cues
+    + (ex.cues&&ex.cues.length?
+      '<div class="card mb10" style="padding:12px 14px;border-color:rgba(0,204,136,.2);">'
+      + '<div class="bold f12 mb8" style="text-transform:uppercase;letter-spacing:.4px;color:var(--grn);">✅ Coaching Cues</div>'
+      + '<div class="col" style="gap:6px;">'
+      + ex.cues.map(function(c,i){ return '<div class="f13" style="display:-webkit-flex;display:flex;gap:8px;line-height:1.5;"><span style="color:var(--grn);font-weight:800;flex-shrink:0;">'+(i+1)+'.</span>'+esc(c)+'</div>'; }).join('')
+      + '</div></div>'
+    :'')
+
+    // Common mistakes
+    + (ex.mistakes&&ex.mistakes.length?
+      '<div class="card mb10" style="padding:12px 14px;border-color:rgba(255,179,0,.2);">'
+      + '<div class="bold f12 mb8" style="text-transform:uppercase;letter-spacing:.4px;color:var(--gold);">⚠️ Common Mistakes</div>'
+      + '<div class="col" style="gap:6px;">'
+      + ex.mistakes.map(function(m){ return '<div class="f13" style="display:-webkit-flex;display:flex;gap:8px;line-height:1.5;"><span style="color:var(--gold);flex-shrink:0;">✗</span>'+esc(m)+'</div>'; }).join('')
+      + '</div></div>'
+    :'')
+
+    // YouTube link
+    + '<button onclick="window.open(\'https://www.youtube.com/results?search_query='+encodeURIComponent(ex.youtubeQuery||ex.name+' exercise tutorial')+'\',\'_blank\')" class="btn btn-ghost btn-sm" style="display:block;width:100%;text-align:center;margin-bottom:8px;border-color:var(--acc);color:var(--acc);cursor:pointer;">▶ Watch Form Video on YouTube</button>'
+
+    // If in picker mode, show add button
+    + (LIB_PICKER_CID?'<button class="btn btn-primary" onclick="closeModalDirect();pickExercise(\''+ex.id+'\')">+ Add to Program</button>':'')
+    + '<button class="btn btn-ghost btn-sm mt6" onclick="closeModalDirect()">Close</button>';
+
+  openModal(html);
+}
+
+
+function buildMuscleSVG(primary, secondary) {
+  function col(muscle) {
+    if(primary.indexOf(muscle)>-1 || primary.indexOf('full_body')>-1) return 'var(--acc)';
+    if(secondary.indexOf(muscle)>-1) return 'var(--gold)';
+    return '#1e1e2e';
+  }
+  var s = col, t = '#333';
+
+  return '<div style="display:-webkit-flex;display:flex;gap:8px;justify-content:center;margin:4px 0;flex-wrap:wrap;">'
+  // FRONT
+  + '<div style="text-align:center;">'
+  + '<div class="sub f10 mb4">FRONT</div>'
+  + '<svg width="110" height="200" viewBox="0 0 110 200" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+  // head
+  + '<ellipse cx="55" cy="16" rx="11" ry="13" fill="#2a2a3a" stroke="'+t+'" stroke-width="1"/>'
+  // neck
+  + '<rect x="50" y="27" width="10" height="8" rx="2" fill="#2a2a3a" stroke="'+t+'" stroke-width="1"/>'
+  // shoulders
+  + '<ellipse cx="28" cy="40" rx="13" ry="9" fill="'+col('shoulders')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<ellipse cx="82" cy="40" rx="13" ry="9" fill="'+col('shoulders')+'" stroke="'+t+'" stroke-width="1"/>'
+  // chest
+  + '<path d="M37 35 Q55 28 73 35 L70 58 Q55 65 40 58 Z" fill="'+col('chest')+'" stroke="'+t+'" stroke-width="1"/>'
+  // core / abs
+  + '<rect x="43" y="59" width="24" height="28" rx="4" fill="'+col('core')+'" stroke="'+t+'" stroke-width="1"/>'
+  // hip_flexors
+  + '<path d="M43 87 L38 104 L52 104 L55 87Z" fill="'+col('hip_flexors')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<path d="M67 87 L72 104 L58 104 L55 87Z" fill="'+col('hip_flexors')+'" stroke="'+t+'" stroke-width="1"/>'
+  // biceps (front upper arm)
+  + '<rect x="16" y="44" width="9" height="22" rx="4" fill="'+col('biceps')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="85" y="44" width="9" height="22" rx="4" fill="'+col('biceps')+'" stroke="'+t+'" stroke-width="1"/>'
+  // triceps (back of upper arm — show as side strip on front view)
+  + '<rect x="13" y="44" width="5" height="22" rx="2" fill="'+col('triceps')+'" stroke="'+t+'" stroke-width="1" opacity=".7"/>'
+  + '<rect x="92" y="44" width="5" height="22" rx="2" fill="'+col('triceps')+'" stroke="'+t+'" stroke-width="1" opacity=".7"/>'
+  // forearms
+  + '<rect x="16" y="68" width="8" height="20" rx="3" fill="'+col('forearms')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="86" y="68" width="8" height="20" rx="3" fill="'+col('forearms')+'" stroke="'+t+'" stroke-width="1"/>'
+  // quads
+  + '<rect x="38" y="104" width="14" height="38" rx="5" fill="'+col('quads')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="58" y="104" width="14" height="38" rx="5" fill="'+col('quads')+'" stroke="'+t+'" stroke-width="1"/>'
+  // calves (front)
+  + '<rect x="39" y="148" width="12" height="28" rx="4" fill="'+col('calves')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="59" y="148" width="12" height="28" rx="4" fill="'+col('calves')+'" stroke="'+t+'" stroke-width="1"/>'
+  // knees
+  + '<ellipse cx="45" cy="144" rx="7" ry="5" fill="#1e1e2e" stroke="'+t+'" stroke-width="1"/>'
+  + '<ellipse cx="65" cy="144" rx="7" ry="5" fill="#1e1e2e" stroke="'+t+'" stroke-width="1"/>'
+  + '</svg>'
+  + '</div>'
+  // BACK
+  + '<div style="text-align:center;">'
+  + '<div class="sub f10 mb4">BACK</div>'
+  + '<svg width="110" height="200" viewBox="0 0 110 200" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+  // head
+  + '<ellipse cx="55" cy="16" rx="11" ry="13" fill="#2a2a3a" stroke="'+t+'" stroke-width="1"/>'
+  // neck
+  + '<rect x="50" y="27" width="10" height="8" rx="2" fill="#2a2a3a" stroke="'+t+'" stroke-width="1"/>'
+  // traps
+  + '<path d="M40 30 Q55 24 70 30 L68 44 L42 44Z" fill="'+col('traps')+'" stroke="'+t+'" stroke-width="1"/>'
+  // shoulders (rear)
+  + '<ellipse cx="28" cy="40" rx="13" ry="9" fill="'+col('shoulders')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<ellipse cx="82" cy="40" rx="13" ry="9" fill="'+col('shoulders')+'" stroke="'+t+'" stroke-width="1"/>'
+  // back (upper)
+  + '<path d="M37 44 Q55 40 73 44 L70 65 Q55 70 40 65Z" fill="'+col('back')+'" stroke="'+t+'" stroke-width="1"/>'
+  // lats
+  + '<path d="M37 50 L27 72 L40 78 L42 64Z" fill="'+col('lats')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<path d="M73 50 L83 72 L70 78 L68 64Z" fill="'+col('lats')+'" stroke="'+t+'" stroke-width="1"/>'
+  // lower back / core (back)
+  + '<rect x="43" y="65" width="24" height="22" rx="4" fill="'+col('core')+'" stroke="'+t+'" stroke-width="1" opacity=".7"/>'
+  // glutes
+  + '<ellipse cx="45" cy="97" rx="13" ry="11" fill="'+col('glutes')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<ellipse cx="65" cy="97" rx="13" ry="11" fill="'+col('glutes')+'" stroke="'+t+'" stroke-width="1"/>'
+  // triceps (back upper arm)
+  + '<rect x="14" y="44" width="9" height="22" rx="4" fill="'+col('triceps')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="87" y="44" width="9" height="22" rx="4" fill="'+col('triceps')+'" stroke="'+t+'" stroke-width="1"/>'
+  // forearms (back)
+  + '<rect x="15" y="68" width="8" height="20" rx="3" fill="'+col('forearms')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="87" y="68" width="8" height="20" rx="3" fill="'+col('forearms')+'" stroke="'+t+'" stroke-width="1"/>'
+  // hamstrings
+  + '<rect x="38" y="109" width="14" height="34" rx="5" fill="'+col('hamstrings')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="58" y="109" width="14" height="34" rx="5" fill="'+col('hamstrings')+'" stroke="'+t+'" stroke-width="1"/>'
+  // calves (back)
+  + '<rect x="39" y="148" width="12" height="28" rx="4" fill="'+col('calves')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '<rect x="59" y="148" width="12" height="28" rx="4" fill="'+col('calves')+'" stroke="'+t+'" stroke-width="1"/>'
+  + '</svg>'
+  + '</div>'
+  + '</div>';
+}
+
+
+function toast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+function esc(str) {
+  if(!str && str!==0) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+
+
+
+
+function closeModal(e) {
+  if(!e || e.target===document.getElementById("modal")) {
+    document.getElementById("modal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+}
+
+
+
+// ── INIT ─────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", function(){
+  renderLibrary();
+});
+</script>
+</body>
+</html>
