@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RawFitPro — Project Demo Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --slate:#1A1A18; --slate2:#252520; --slate3:#2E2E28;
+  --rust:#C0392B;  --rust2:#A93226;
+  --amber:#D4A853; --sand:#C8B89A; --sandL:#E8D8C0;
+  --stone:#6B6456; --txt:#F0EBE3;  --txtM:#A89880;
+  --bdr:rgba(200,184,154,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body {
+  background:var(--slate);color:var(--txt);
+  font-family:'Barlow',Arial,sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(192,57,43,.08) 0%, transparent 60%);
+}
+a{text-decoration:none;color:inherit;}
+
+/* ── HEADER ──────────────────────────────────────────────────────── */
+header {
+  text-align:center;
+  padding:64px 24px 48px;
+  border-bottom:1px solid var(--bdr);
+}
+.hub-brand {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:clamp(48px,10vw,88px);
+  font-weight:900;letter-spacing:-1px;line-height:1;
+  margin-bottom:6px;
+}
+.hub-brand .w{color:var(--txt);}
+.hub-brand .r{color:var(--rust);}
+.hub-tagline {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:6px;
+  text-transform:uppercase;color:var(--stone);
+  margin-bottom:24px;
+}
+.hub-desc {
+  font-size:16px;color:var(--txtM);
+  max-width:540px;margin:0 auto;line-height:1.7;
+}
+
+/* ── DEMO BADGE ──────────────────────────────────────────────────── */
+.demo-pill {
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(192,57,43,.15);
+  border:1px solid rgba(192,57,43,.3);
+  color:var(--sand);
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:6px 16px;border-radius:2px;
+  margin-bottom:32px;
+}
+.demo-dot {
+  width:7px;height:7px;border-radius:50%;
+  background:var(--rust);animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── GRID ────────────────────────────────────────────────────────── */
+.hub-grid {
+  max-width:1100px;margin:0 auto;
+  padding:64px 24px 80px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+@media(max-width:680px){.hub-grid{grid-template-columns:1fr;}}
+
+/* ── CARDS ───────────────────────────────────────────────────────── */
+.hub-card {
+  background:var(--slate2);
+  border:1px solid var(--bdr);
+  border-radius:2px;
+  padding:40px 36px;
+  display:flex;flex-direction:column;
+  gap:0;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.hub-card::before {
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--rust);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.hub-card:hover {
+  border-color:rgba(200,184,154,.25);
+  transform:translateY(-3px);
+}
+.hub-card:hover::before{transform:scaleX(1);}
+
+/* Featured card (website) — full width */
+.hub-card.featured {
+  grid-column:1/-1;
+  flex-direction:row;
+  align-items:center;
+  gap:40px;
+}
+@media(max-width:680px){.hub-card.featured{flex-direction:column;}}
+
+.card-icon {
+  font-size:44px;margin-bottom:20px;
+  display:block;
+}
+.featured .card-icon {
+  font-size:64px;margin-bottom:0;flex-shrink:0;
+}
+.card-tag {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--rust);margin-bottom:10px;
+}
+.card-title {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:28px;font-weight:900;letter-spacing:.5px;
+  color:var(--txt);margin-bottom:10px;line-height:1.1;
+}
+.card-desc {
+  font-size:14px;color:var(--txtM);line-height:1.7;
+  flex:1;margin-bottom:28px;
+}
+.card-features {
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;
+}
+.card-feat {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  background:rgba(200,184,154,.07);
+  border:1px solid var(--bdr);
+  color:var(--txtM);padding:4px 10px;border-radius:2px;
+}
+.card-cta {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--rust);color:#fff;
+  padding:13px 28px;border-radius:2px;
+  border:none;cursor:pointer;
+  transition:background .2s;
+  align-self:flex-start;
+}
+.card-cta:hover{background:var(--rust2);}
+.card-cta.ghost {
+  background:transparent;color:var(--sand);
+  border:1px solid rgba(200,184,154,.25);
+}
+.card-cta.ghost:hover{background:rgba(200,184,154,.08);}
+
+/* Access badge */
+.access-badge {
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 10px;border-radius:2px;margin-bottom:12px;
+}
+.access-open { background:rgba(0,180,100,.12);color:#00cc70;border:1px solid rgba(0,180,100,.2); }
+.access-protected { background:rgba(212,168,83,.12);color:var(--amber);border:1px solid rgba(212,168,83,.2); }
+.access-trainer { background:rgba(192,57,43,.12);color:#e07060;border:1px solid rgba(192,57,43,.2); }
+
+/* ── HOW TO REVIEW ───────────────────────────────────────────────── */
+.review-section {
+  max-width:1100px;margin:0 auto;
+  padding:0 24px 80px;
+}
+.review-title {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:32px;font-weight:900;letter-spacing:1px;
+  color:var(--txt);margin-bottom:32px;
+}
+.review-steps {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+}
+@media(max-width:680px){.review-steps{grid-template-columns:1fr 1fr;}}
+.review-step {
+  background:var(--slate2);border:1px solid var(--bdr);
+  padding:28px 24px;position:relative;
+}
+.step-num {
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  color:var(--rust);margin-bottom:10px;
+}
+.step-txt {
+  font-size:13px;color:var(--txtM);line-height:1.6;
+}
+.step-txt strong{color:var(--txt);}
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+footer {
+  border-top:1px solid var(--bdr);
+  padding:32px 24px;text-align:center;
+  font-size:12px;color:var(--stone);
+}
+footer strong{color:var(--txtM);}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────────── -->
+<header>
+  <div class="demo-pill">
+    <span class="demo-dot"></span>
+    Project Preview — All Data Fictional
+  </div>
+  <div class="hub-brand">
+    <span class="w">Raw</span><span class="r">Fit</span><span class="w">Pro</span>
+  </div>
+  <div class="hub-tagline">Raw Human Fitness</div>
+  <p class="hub-desc">
+    Full platform preview for Joshua's review. Browse the public website, test the client portal login, explore the exercise library, and walk through the trainer CRM — all with sample data.
+  </p>
+</header>
+
+<!-- ── MAIN GRID ────────────────────────────────────────────────────── -->
+<div class="hub-grid">
+
+  <!-- WEBSITE — featured full width -->
+  <div class="hub-card featured">
+    <span class="card-icon">🌐</span>
+    <div>
+      <div class="card-tag">Public Website</div>
+      <div class="access-badge access-open">🌍 Open to Everyone</div>
+      <div class="card-title">RawFitPro Marketing Website</div>
+      <p class="card-desc">
+        The full public-facing website. Hero section, origin story, services, testimonials, locations, FAQ, client portal access, and contact form. Built with the earthy RawFitPro brand identity — dark slate, rust red, sand tones.
+      </p>
+      <div class="card-features">
+        <span class="card-feat">Hero Photo</span>
+        <span class="card-feat">Origin Story</span>
+        <span class="card-feat">Services</span>
+        <span class="card-feat">Testimonials</span>
+        <span class="card-feat">Locations</span>
+        <span class="card-feat">FAQ</span>
+        <span class="card-feat">Contact Form</span>
+        <span class="card-feat">Portal Links</span>
+      </div>
+      <a href="RawFitPro-Website.html" class="card-cta">View Website →</a>
+    </div>
+  </div>
+
+  <!-- CLIENT PORTAL -->
+  <div class="hub-card">
+    <span class="card-icon">🔐</span>
+    <div class="card-tag">Client Access</div>
+    <div class="access-badge access-protected">🔒 PIN Protected</div>
+    <div class="card-title">Client Portal</div>
+    <p class="card-desc">
+      Private portal for Joshua's clients. Secure login by name + PIN — no client list exposed publicly. Clients see only their own workouts, program, progress tracking, and daily tips.
+    </p>
+    <div class="card-features">
+      <span class="card-feat">Secure Login</span>
+      <span class="card-feat">Daily Workout</span>
+      <span class="card-feat">Set Logging</span>
+      <span class="card-feat">Progress History</span>
+      <span class="card-feat">Tip of the Day</span>
+    </div>
+    <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);padding:14px 16px;border-radius:2px;margin-bottom:24px;">
+      <div style="font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;color:var(--rust);text-transform:uppercase;margin-bottom:8px;">Demo Credentials</div>
+      <div style="font-size:13px;color:var(--txtM);line-height:1.8;">
+        Name: <strong style="color:var(--txt);">Marcus Webb</strong> · PIN: <strong style="color:var(--txt);">1234</strong><br>
+        Name: <strong style="color:var(--txt);">Sofia Martinez</strong> · PIN: <strong style="color:var(--txt);">5678</strong><br>
+        Name: <strong style="color:var(--txt);">Ashley Trahan</strong> · PIN: <strong style="color:var(--txt);">9999</strong>
+      </div>
+    </div>
+    <a href="RawFitPro-Client-Portal.html" class="card-cta">Try Client Portal →</a>
+  </div>
+
+  <!-- EXERCISE LIBRARY -->
+  <div class="hub-card">
+    <span class="card-icon">📚</span>
+    <div class="card-tag">Public Resource</div>
+    <div class="access-badge access-open">🌍 Open to Everyone</div>
+    <div class="card-title">Exercise Library</div>
+    <p class="card-desc">
+      100+ exercises across 15 categories. Every exercise includes muscle diagrams with color-coded activation zones, coaching cues, common mistakes, and a direct YouTube form video link.
+    </p>
+    <div class="card-features">
+      <span class="card-feat">100+ Exercises</span>
+      <span class="card-feat">15 Categories</span>
+      <span class="card-feat">Muscle Diagrams</span>
+      <span class="card-feat">Coaching Cues</span>
+      <span class="card-feat">Form Videos</span>
+      <span class="card-feat">Search + Filter</span>
+    </div>
+    <a href="RawFitPro-Exercise-Library.html" class="card-cta">Browse Library →</a>
+  </div>
+
+  <!-- CRM APP -->
+  <div class="hub-card" style="grid-column:1/-1;">
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+      <span class="card-icon" style="margin-bottom:0;font-size:52px;flex-shrink:0;">⚡</span>
+      <div style="flex:1;min-width:280px;">
+        <div class="card-tag">Trainer Only — Private</div>
+        <div class="access-badge access-trainer">🔐 Trainer Access Only</div>
+        <div class="card-title">RawFitPro Trainer CRM</div>
+        <p class="card-desc">
+          Joshua's complete business management platform. 40-client roster, scheduling, program builder, workout portal, exercise library picker, SMS tips, content calendar, and website preview — all in one file. In production this file is kept private and never linked publicly.
+        </p>
+        <div class="card-features">
+          <span class="card-feat">Client Dashboard</span>
+          <span class="card-feat">Schedule Manager</span>
+          <span class="card-feat">Program Builder</span>
+          <span class="card-feat">Client Portal View</span>
+          <span class="card-feat">Exercise Library</span>
+          <span class="card-feat">Plan Builder Quiz</span>
+          <span class="card-feat">SMS Tips</span>
+          <span class="card-feat">Content Calendar</span>
+          <span class="card-feat">Website Preview</span>
+          <span class="card-feat">40 Demo Clients</span>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="RawFitPro-App.html" class="card-cta">Open Trainer CRM →</a>
+          <span class="card-cta ghost" style="cursor:default;">⚠️ Demo — All Data Fictional</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── HOW TO REVIEW ──────────────────────────────────────────────── -->
+<div class="review-section">
+  <div class="review-title">How to Review This Demo</div>
+  <div class="review-steps">
+    <div class="review-step">
+      <div class="step-num">Step 01</div>
+      <p class="step-txt"><strong>Start with the Website.</strong> Scroll through the full site — hero, story, services, FAQ, portal section. This is what the public sees at rawfitpro.com.</p>
+    </div>
+    <div class="review-step">
+      <div class="step-num">Step 02</div>
+      <p class="step-txt"><strong>Test the Client Portal.</strong> Click a demo client button in the banner or enter Marcus Webb + PIN 1234. Experience the full client login and workout flow.</p>
+    </div>
+    <div class="review-step">
+      <div class="step-num">Step 03</div>
+      <p class="step-txt"><strong>Browse the Library.</strong> Search, filter by category, tap any exercise for muscle diagrams, coaching cues, and form video link.</p>
+    </div>
+    <div class="review-step">
+      <div class="step-num">Step 04</div>
+      <p class="step-txt"><strong>Explore the CRM.</strong> This is your private trainer dashboard. Browse clients, schedules, program builder, portal, and all business tools.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer>
+  <strong>RawFitPro — Raw Human Fitness</strong> · Project Demo Preview · All client data shown is fictional ·
+  Built for Joshua's review prior to deployment on <strong>rawfitpro.com</strong>
+</footer>
+
+</body>
+</html>
